@@ -6,22 +6,81 @@ from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation, ROUND_CEILING, ROUND_FLOOR, ROUND_HALF_UP
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
+from typing import Callable
 
-# Índices baseados no cabeçalho do S_Item.ini, começando em zero.
+# =============================================================================
+# Índices baseados no cabeçalho fornecido: |V.6|194|
+# Os índices são zero-based.
+# =============================================================================
 FIELD_INDEX = {
     "Id": 0,
+    "IconFilename": 1,
+    "ModelId": 2,
+    "ModelFilename": 3,
+    "WeaponEffectId": 4,
+    "FlyEffectId": 5,
+    "UsedEffectId": 6,
+    "UsedSoundName": 7,
+    "EnhanceEffectId": 8,
     "Name": 9,
     "ItemType": 10,
     "EquipType": 11,
+    "OpFlags": 12,
+    "OpFlagsPlus": 13,
+    "Target": 14,
+    "RestrictGender": 15,
     "RestrictLevel": 16,
+    "RestrictMaxLevel": 17,
     "RebirthCount": 18,
+    "RebirthScore": 19,
+    "RebirthMaxScore": 20,
+    "RestrictAlign": 21,
+    "RestrictPrestige": 22,
     "RestrictClass": 23,
+    "ItemQuality": 24,
+    "ItemGroup": 25,
+    "CastingTime": 26,
+    "CoolDownTime": 27,
     "CoolDownGroup": 28,
+    "MaxHp": 29,
+    "MaxMp": 30,
     "Str": 31,
     "Con": 32,
+    "Int": 33,
+    "Vol": 34,
     "Dex": 35,
+    "AvgPhysicoDamage": 36,
+    "RandPhysicoDamage": 37,
+    "AttackRange": 38,
+    "AttackSpeed": 39,
     "Attack": 40,
+    "RangeAttack": 41,
     "PhysicoDefence": 42,
+    "MagicDamage": 43,
+    "MagicDefence": 44,
+    "HitRate": 45,
+    "DodgeRate": 46,
+    "PhysicoCriticalRate": 47,
+    "PhysicoCriticalDamage": 48,
+    "MagicCriticalRate": 49,
+    "MagicCriticalDamage": 50,
+    "PhysicalPenetration": 51,
+    "MagicalPenetration": 52,
+    "PhysicalPenetrationDefence": 53,
+    "MagicalPenetrationDefence": 54,
+    "Attribute": 55,
+    "AttributeRate": 56,
+    "AttributeDamage": 57,
+    "AttributeResist": 58,
+    "SpecialType": 59,
+    "SpecialRate": 60,
+    "SpecialDamage": 61,
+    "DropRate": 62,
+    "DropIndex": 63,
+    "TreasureBuffs0": 64,
+    "TreasureBuffs1": 65,
+    "TreasureBuffs2": 66,
+    "TreasureBuffs3": 67,
     "EnchantType": 68,
     "EnchantId": 69,
     "ExpertLevel": 70,
@@ -29,14 +88,32 @@ FIELD_INDEX = {
     "ElfSkillId": 72,
     "EnchantTimeType": 73,
     "EnchantDuration": 74,
+    "LimitType": 75,
+    "DueDateTime": 76,
+    "BackpackSize": 77,
+    "MaxSocket": 78,
+    "SocketRate": 79,
+    "MaxDurability": 80,
+    "MaxStack": 81,
+    "ShopPriceType": 82,
+    "SysPrice": 83,
+    "RestrictEventPosId": 84,
+    "TargetIDs": 85,
+    "BlockRate": 86,
+    "LogLevel": 87,
+    "AuctionType": 88,
+    "ExtraData0": 89,
+    "ExtraData1": 90,
+    "ExtraData2": 91,
+    "Tip": 92,
 }
 
-ITEM_TYPE_BATTLE_AXE = "12"       # BattleAxe / machado de 2 mãos
-ITEM_TYPE_CRYSTAL_KATANA = "59"  # CrystalKatana / katana
-ITEM_TYPE_CRYSTAL_KEY = "60"     # CrystalKey / chave
+ITEM_TYPE_BATTLE_AXE = "12"
+ITEM_TYPE_CRYSTAL_KATANA = "59"
+ITEM_TYPE_CRYSTAL_KEY = "60"
 
 EQUIP_TYPE_HEAD = "1"
-ARMOR_EQUIP_TYPES = {"1", "2", "3", "4", "5", "6"}  # Head, Chest, Pants, Glove, Feet, Back
+ARMOR_EQUIP_TYPES = {"1", "2", "3", "4", "5", "6"}
 
 ENCHANT_FIELD_NAMES = (
     "EnchantType",
@@ -48,7 +125,6 @@ ENCHANT_FIELD_NAMES = (
     "EnchantDuration",
 )
 
-# Máscara da árvore Traveler. Esses valores são armazenados como bitmask em texto hexadecimal/numérico.
 TRAVELER_CLASS_FLAGS = {
     "10000000000000": "Traveler",
     "20000000000000": "Nomad",
@@ -68,6 +144,10 @@ INTEGER_PATTERN = re.compile(r"^[+-]?\d+$")
 HEX_PATTERN = re.compile(r"^[0-9A-Fa-f]+$")
 COOLDOWN_SPLIT_PATTERN = re.compile(r"[\s,;|/]+")
 
+
+# =============================================================================
+# Data classes
+# =============================================================================
 
 @dataclass
 class ProcessingOptions:
@@ -177,12 +257,31 @@ class ProcessingReport:
         )
 
 
+@dataclass
+class RemovalReport:
+    item_files_processed: list[Path] = field(default_factory=list)
+    items_found_total: int = 0
+    items_removed_total: int = 0
+    removed_ids: list[str] = field(default_factory=list)
+
+    store_files_processed: list[Path] = field(default_factory=list)
+    store_refs_removed: int = 0
+
+    drop_files_processed: list[Path] = field(default_factory=list)
+    drop_refs_removed: int = 0
+
+    item_file_counts: dict[str, int] = field(default_factory=dict)
+
+
+# =============================================================================
+# Core parsing / encoding helpers
+# =============================================================================
+
 class ItemIniError(ValueError):
     pass
 
 
 def detect_encoding(data: bytes) -> tuple[str, str]:
-    """Detecta uma codificação compatível e mantém a gravação na mesma base."""
     candidates: tuple[tuple[str, str], ...] = (
         ("utf-8-sig", "UTF-8 com BOM"),
         ("utf-8", "UTF-8"),
@@ -221,7 +320,7 @@ def parse_header(header_line: str) -> tuple[str, int]:
     header_without_eol = header_line.rstrip("\r\n")
     match = HEADER_PATTERN.fullmatch(header_without_eol)
     if not match:
-        raise ItemIniError("Cabeçalho inválido. Era esperado algo como: |V.16|93|")
+        raise ItemIniError("Cabeçalho inválido. Era esperado algo como: |V.6|194|")
 
     version = match.group(1)
     pipes_per_record = int(match.group(2))
@@ -313,7 +412,6 @@ def parse_int_field(value: str) -> int | None:
 
 
 def parse_class_mask(value: str) -> int | None:
-    """Lê RestrictClass como máscara hexadecimal/numérica."""
     cleaned = value.strip()
     if not cleaned:
         return None
@@ -323,7 +421,6 @@ def parse_class_mask(value: str) -> int | None:
 
 
 def is_traveler_class_mask(value: str) -> tuple[bool, bool]:
-    """Retorna (é Traveler, máscara inválida)."""
     mask = parse_class_mask(value)
     if mask is None:
         return False, bool(value.strip())
@@ -347,11 +444,6 @@ def move_attribute_to_con(
     *,
     add_to_existing_con: bool,
 ) -> tuple[bool, bool, bool, bool]:
-    """Move um atributo para Con.
-
-    Retorna:
-        updated, invalid_source, invalid_con, con_was_filled
-    """
     source_value = parse_int_field(fields[source_index])
     if source_value is None:
         if fields[source_index].strip():
@@ -380,7 +472,6 @@ def move_str_and_dex_to_con(
     *,
     add_to_existing_con: bool,
 ) -> dict[str, int | bool]:
-    """Move Str e Dex para Con no mesmo item, somando de forma segura."""
     result: dict[str, int | bool] = {
         "updated": False,
         "str_moved": 0,
@@ -466,6 +557,10 @@ def build_enchant_lookup(parsed_base: ParsedIni, fields_to_copy: tuple[str, ...]
         lookup.cooldown_by_id[item_id] = record.fields[FIELD_INDEX["CoolDownGroup"]].strip()
     return lookup
 
+
+# -----------------------------------------------------------------------------
+# Existing balance processing
+# -----------------------------------------------------------------------------
 
 def process_item_file(
     data: bytes,
@@ -644,6 +739,231 @@ def format_decimal_for_filename(value: Decimal) -> str:
     return text.replace(".", "p").replace("-", "m")
 
 
+# =============================================================================
+# Item Removal Feature (only C_* files, output folder)
+# =============================================================================
+
+def icon_filename_between(value: str, lo: int, hi: int) -> bool:
+    val = value.strip()
+    if not val or len(val) < 2 or val[0].upper() != "I":
+        return False
+    try:
+        num = int(val[1:])
+    except ValueError:
+        return False
+    return lo <= num <= hi
+
+
+def match_removal_criteria(fields: list[str]) -> bool:
+    # IconFilename between I00595 and I00609 (inclusive)
+    icon = fields[FIELD_INDEX["IconFilename"]]
+    if not icon_filename_between(icon, 595, 614):
+        return False
+
+    # CastingTime = 30
+    casting = fields[FIELD_INDEX["CastingTime"]].strip()
+    if casting != "30":
+        return False
+
+    # CoolDownTime = 10
+    cooldown_time = fields[FIELD_INDEX["CoolDownTime"]].strip()
+    if cooldown_time != "10":
+        return False
+
+    # CoolDownGroup = 994
+    cooldown_group = fields[FIELD_INDEX["CoolDownGroup"]].strip()
+    if cooldown_group != "994":
+        return False
+
+    # AuctionType = 32
+    auction = fields[FIELD_INDEX["AuctionType"]].strip()
+    if auction != "32":
+        return False
+
+    return True
+
+
+def remove_items_from_item_file(data: bytes) -> tuple[bytes, list[str]]:
+    parsed = parse_item_ini(data, source_label="item file (C_)")
+    new_records: list[ItemRecord] = []
+    found_ids: list[str] = []
+
+    for record in parsed.records:
+        fields = record.fields
+        if match_removal_criteria(fields):
+            item_id = fields[FIELD_INDEX["Id"]].strip()
+            if item_id:
+                found_ids.append(item_id)
+            # Skip this record (remove it)
+        else:
+            new_records.append(record)
+
+    parsed.records = new_records
+    return encode_parsed_ini(parsed), found_ids
+
+
+# =============================================================================
+# CORRIGIDO: Store.ini com offset=2 para pular ID do vendedor e nome
+# =============================================================================
+def remove_references_from_store(data: bytes, removed_ids: set[str]) -> tuple[bytes, int]:
+    """
+    Remove references to removed item IDs from C_Store.ini.
+    Each record has 2 initial fields (vendor ID, vendor name) followed by
+    groups of 3 fields: ItemID | Name | Quantity.
+    When a match is found, clear all 3 fields.
+    """
+    parsed = parse_item_ini(data, source_label="store file (C_)")
+    group_size = 3
+    offset = 2  # Pular os dois campos iniciais (vendedor e nome)
+    total_cleared = 0
+
+    for record in parsed.records:
+        fields = record.fields
+        for i in range(offset, len(fields), group_size):
+            if i + group_size > len(fields):
+                break
+            item_id = fields[i].strip()
+            if item_id in removed_ids:
+                for j in range(i, i + group_size):
+                    fields[j] = ""
+                total_cleared += 1
+
+    return encode_parsed_ini(parsed), total_cleared
+
+
+# =============================================================================
+# CORRIGIDO: DropItem.ini com offset=1 para pular o ID do drop source
+# =============================================================================
+def remove_references_from_drop(data: bytes, removed_ids: set[str]) -> tuple[bytes, int]:
+    """
+    Remove references to removed item IDs from C_DropItem.ini.
+    Each record has 1 initial field (drop source ID) followed by
+    groups of 4 fields: ItemID | Name | Quantity | Percentage.
+    When a match is found, clear all 4 fields.
+    """
+    parsed = parse_item_ini(data, source_label="drop file (C_)")
+    group_size = 4
+    offset = 1  # Pular o primeiro campo (ID do drop source)
+    total_cleared = 0
+
+    for record in parsed.records:
+        fields = record.fields
+        for i in range(offset, len(fields), group_size):
+            if i + group_size > len(fields):
+                break
+            item_id = fields[i].strip()
+            if item_id in removed_ids:
+                for j in range(i, i + group_size):
+                    fields[j] = ""
+                total_cleared += 1
+
+    return encode_parsed_ini(parsed), total_cleared
+
+
+def process_removal(
+    input_folder: Path,
+    output_folder: Path,
+    *,
+    progress_callback: Callable[[str], None] | None = None,
+) -> RemovalReport:
+    report = RemovalReport()
+
+    output_folder.mkdir(parents=True, exist_ok=True)
+
+    # Only C_* files
+    item_files = [
+        input_folder / "C_Item.ini",
+        input_folder / "C_ItemMall.ini",
+    ]
+    store_files = [
+        input_folder / "C_Store.ini",
+    ]
+    drop_files = [
+        input_folder / "C_DropItem.ini",
+    ]
+
+    item_files = [f for f in item_files if f.exists()]
+    store_files = [f for f in store_files if f.exists()]
+    drop_files = [f for f in drop_files if f.exists()]
+
+    if not item_files:
+        raise ItemIniError("Nenhum arquivo C_Item ou C_ItemMall encontrado na pasta de entrada.")
+
+    all_removed_ids: list[str] = []
+
+    # ---- Step 1: Process item files ----
+    for file_path in item_files:
+        if progress_callback:
+            progress_callback(f"Processando {file_path.name}...")
+
+        try:
+            data = file_path.read_bytes()
+            new_data, found_ids = remove_items_from_item_file(data)
+
+            out_path = output_folder / file_path.name
+            out_path.write_bytes(new_data)
+
+            if found_ids:
+                report.item_file_counts[file_path.name] = len(found_ids)
+                all_removed_ids.extend(found_ids)
+                report.items_found_total += len(found_ids)
+                report.items_removed_total += len(found_ids)
+            else:
+                report.item_file_counts[file_path.name] = 0
+
+            report.item_files_processed.append(file_path)
+
+        except Exception as e:
+            if progress_callback:
+                progress_callback(f"Erro ao processar {file_path.name}: {e}")
+            report.item_files_processed.append(file_path)
+            report.item_file_counts[file_path.name] = 0
+
+    # ---- Step 2: Build set of removed IDs ----
+    removed_set = set(all_removed_ids)
+    report.removed_ids = sorted(all_removed_ids) if all_removed_ids else []
+
+    # ---- Step 3: Process Store files ----
+    for file_path in store_files:
+        if progress_callback:
+            progress_callback(f"Limpando referências em {file_path.name}...")
+
+        try:
+            data = file_path.read_bytes()
+            new_data, cleared = remove_references_from_store(data, removed_set)
+            out_path = output_folder / file_path.name
+            out_path.write_bytes(new_data)
+            report.store_refs_removed += cleared
+            report.store_files_processed.append(file_path)
+        except Exception as e:
+            if progress_callback:
+                progress_callback(f"Erro ao processar {file_path.name}: {e}")
+            report.store_files_processed.append(file_path)
+
+    # ---- Step 4: Process DropItem files ----
+    for file_path in drop_files:
+        if progress_callback:
+            progress_callback(f"Limpando referências em {file_path.name}...")
+
+        try:
+            data = file_path.read_bytes()
+            new_data, cleared = remove_references_from_drop(data, removed_set)
+            out_path = output_folder / file_path.name
+            out_path.write_bytes(new_data)
+            report.drop_refs_removed += cleared
+            report.drop_files_processed.append(file_path)
+        except Exception as e:
+            if progress_callback:
+                progress_callback(f"Erro ao processar {file_path.name}: {e}")
+            report.drop_files_processed.append(file_path)
+
+    return report
+
+
+# =============================================================================
+# GUI Application (balance + removal tabs)
+# =============================================================================
+
 class ItemBalancerApp:
     ROUND_LABELS = {
         "floor": "Arredondar para baixo",
@@ -661,13 +981,14 @@ class ItemBalancerApp:
 
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
-        self.root.title("S_Item.ini — Balanceador de atributos e enchants")
-        self.root.geometry("1040x850")
-        self.root.minsize(940, 760)
+        self.root.title("S_Item.ini — Balanceador + Remoção de itens")
+        self.root.geometry("1080x940")
+        self.root.minsize(960, 800)
 
         self.input_path: Path | None = None
         self.base_path: Path | None = None
 
+        # ---- Balancing options ----
         self.battleaxe_var = tk.BooleanVar(value=True)
         self.katana_var = tk.BooleanVar(value=True)
         self.key_var = tk.BooleanVar(value=True)
@@ -686,35 +1007,61 @@ class ItemBalancerApp:
         self.base_file_var = tk.StringVar(value="INI base de enchants: nenhum arquivo selecionado.")
         self.status_var = tk.StringVar(value="Configure as opções, escolha os arquivos e processe.")
 
+        # ---- Removal options ----
+        self.removal_input_folder_var = tk.StringVar(value="")
+        self.removal_output_folder_var = tk.StringVar(value="")
+        self.removal_status_var = tk.StringVar(value="Nenhuma pasta selecionada.")
+        self.removal_progress_var = tk.StringVar(value="Aguardando...")
+
         self._build_interface()
 
     def _build_interface(self) -> None:
-        main = ttk.Frame(self.root, padding=16)
-        main.pack(fill="both", expand=True)
+        notebook = ttk.Notebook(self.root)
+        notebook.pack(fill="both", expand=True, padx=8, pady=8)
 
+        # ---- Tab 1: Balancing ----
+        balance_frame = ttk.Frame(notebook, padding=12)
+        notebook.add(balance_frame, text="Balanceamento")
+        self._build_balance_tab(balance_frame)
+
+        # ---- Tab 2: Removal ----
+        removal_frame = ttk.Frame(notebook, padding=12)
+        notebook.add(removal_frame, text="Remoção de itens")
+        self._build_removal_tab(removal_frame)
+
+        # ---- Status bar ----
+        status_bar = ttk.Frame(self.root)
+        status_bar.pack(fill="x", padx=8, pady=(0, 8))
+        ttk.Label(status_bar, textvariable=self.status_var, wraplength=1060).pack(anchor="w")
+
+    # -------------------------------------------------------------------------
+    # Balance Tab
+    # -------------------------------------------------------------------------
+
+    def _build_balance_tab(self, parent: ttk.Frame) -> None:
         title = ttk.Label(
-            main,
+            parent,
             text="Balanceador de S_Item.ini",
-            font=("Segoe UI", 17, "bold"),
+            font=("Segoe UI", 16, "bold"),
         )
         title.pack(anchor="w")
 
         subtitle = ttk.Label(
-            main,
+            parent,
             text=(
                 "Processa armas, armaduras, níveis, RebirthCount e enchants por CoolDownGroup, "
                 "preservando cabeçalho, codificação, quebras de linha e todos os campos não selecionados."
             ),
-            wraplength=960,
+            wraplength=1000,
             justify="left",
         )
-        subtitle.pack(anchor="w", pady=(5, 12))
+        subtitle.pack(anchor="w", pady=(4, 12))
 
-        file_frame = ttk.LabelFrame(main, text="1. Arquivos", padding=10)
+        file_frame = ttk.LabelFrame(parent, text="1. Arquivos", padding=10)
         file_frame.pack(fill="x")
 
-        ttk.Label(file_frame, textvariable=self.file_var, wraplength=950).pack(anchor="w")
-        ttk.Label(file_frame, textvariable=self.base_file_var, wraplength=950).pack(anchor="w", pady=(4, 0))
+        ttk.Label(file_frame, textvariable=self.file_var, wraplength=990).pack(anchor="w")
+        ttk.Label(file_frame, textvariable=self.base_file_var, wraplength=990).pack(anchor="w", pady=(4, 0))
 
         button_row = ttk.Frame(file_frame)
         button_row.pack(fill="x", pady=(10, 0))
@@ -724,7 +1071,7 @@ class ItemBalancerApp:
         ttk.Button(button_row, text="Processar e salvar...", command=self.process_and_save).pack(side="left", padx=(8, 0))
         ttk.Button(button_row, text="Processar outro arquivo...", command=self.select_process_and_save).pack(side="left", padx=(8, 0))
 
-        options_frame = ttk.LabelFrame(main, text="2. Regras de alteração", padding=10)
+        options_frame = ttk.LabelFrame(parent, text="2. Regras de alteração", padding=10)
         options_frame.pack(fill="x", pady=(12, 0))
 
         battleaxe_row = ttk.Frame(options_frame)
@@ -791,7 +1138,7 @@ class ItemBalancerApp:
             text="Ao mover atributos, somar no Con existente. Se desmarcado, substitui o Con pelo valor movido.",
         ).pack(anchor="w")
 
-        enchant_frame = ttk.LabelFrame(main, text="3. Enchants por CoolDownGroup", padding=10)
+        enchant_frame = ttk.LabelFrame(parent, text="3. Enchants por CoolDownGroup", padding=10)
         enchant_frame.pack(fill="x", pady=(12, 0))
 
         ttk.Checkbutton(
@@ -818,27 +1165,24 @@ class ItemBalancerApp:
         )
         enchant_combo.pack(side="left", padx=(8, 0))
 
-        info_frame = ttk.LabelFrame(main, text="4. Classes Traveler consideradas", padding=10)
+        info_frame = ttk.LabelFrame(parent, text="4. Classes Traveler consideradas", padding=10)
         info_frame.pack(fill="x", pady=(12, 0))
 
         classes_text = (
             "Traveler, Nomad, Swordsman, Illusionist, Samurai, Augur, Ronin, Oracle, "
             "Dimensional Master e Chronos. O RestrictClass é lido como soma/máscara desses valores."
         )
-        ttk.Label(info_frame, text=classes_text, wraplength=950, justify="left").pack(anchor="w")
+        ttk.Label(info_frame, text=classes_text, wraplength=990, justify="left").pack(anchor="w")
 
-        report_frame = ttk.LabelFrame(main, text="5. Relatório", padding=10)
+        report_frame = ttk.LabelFrame(parent, text="5. Relatório", padding=10)
         report_frame.pack(fill="both", expand=True, pady=(12, 0))
 
-        self.report_text = tk.Text(report_frame, height=13, wrap="word", state="disabled")
+        self.report_text = tk.Text(report_frame, height=14, wrap="word", state="disabled")
         self.report_text.pack(side="left", fill="both", expand=True)
 
         scroll = ttk.Scrollbar(report_frame, orient="vertical", command=self.report_text.yview)
         scroll.pack(side="right", fill="y")
         self.report_text.configure(yscrollcommand=scroll.set)
-
-        status_label = ttk.Label(main, textvariable=self.status_var, wraplength=960, justify="left")
-        status_label.pack(anchor="w", pady=(8, 0))
 
         self._write_report(
             "Pronto.\n\n"
@@ -852,6 +1196,331 @@ class ItemBalancerApp:
             "- RebirthCount: limpa qualquer valor preenchido.\n\n"
             "Dica: deixe 'somar no Con existente' marcado para não perder um Con que o item já possuía."
         )
+
+    # -------------------------------------------------------------------------
+    # Removal Tab
+    # -------------------------------------------------------------------------
+
+    def _build_removal_tab(self, parent: ttk.Frame) -> None:
+        title = ttk.Label(
+            parent,
+            text="Remoção automática de itens (apenas C_*)",
+            font=("Segoe UI", 16, "bold"),
+        )
+        title.pack(anchor="w")
+
+        desc = ttk.Label(
+            parent,
+            text=(
+                "Remove itens que atendem TODOS os critérios abaixo:\n"
+                "• IconFilename entre I00595 e I00609 (inclusive)\n"
+                "• CastingTime = 30\n"
+                "• CoolDownTime = 10\n"
+                "• CoolDownGroup = 994\n"
+                "• AuctionType = 32\n\n"
+                "Os itens são removidos de C_Item.ini e C_ItemMall.ini.\n"
+                "Em seguida, todas as referências são limpas em C_Store.ini e C_DropItem.ini.\n"
+                "Os arquivos originais NÃO são modificados – as versões alteradas são salvas na pasta de saída."
+            ),
+            wraplength=1000,
+            justify="left",
+        )
+        desc.pack(anchor="w", pady=(4, 12))
+
+        # ---- Folder selection ----
+        folder_frame = ttk.LabelFrame(parent, text="1. Pastas", padding=10)
+        folder_frame.pack(fill="x")
+
+        # Input folder
+        input_row = ttk.Frame(folder_frame)
+        input_row.pack(fill="x", pady=(0, 6))
+        ttk.Label(input_row, text="Pasta de entrada (com C_*.ini):").pack(side="left")
+        self.input_folder_entry = ttk.Entry(input_row, textvariable=self.removal_input_folder_var, width=50)
+        self.input_folder_entry.pack(side="left", padx=(8, 8))
+        ttk.Button(input_row, text="Selecionar...", command=self.select_removal_input_folder).pack(side="left")
+
+        # Output folder
+        output_row = ttk.Frame(folder_frame)
+        output_row.pack(fill="x", pady=(0, 6))
+        ttk.Label(output_row, text="Pasta de saída (modificados):").pack(side="left")
+        self.output_folder_entry = ttk.Entry(output_row, textvariable=self.removal_output_folder_var, width=50)
+        self.output_folder_entry.pack(side="left", padx=(8, 8))
+        ttk.Button(output_row, text="Selecionar...", command=self.select_removal_output_folder).pack(side="left")
+
+        ttk.Label(folder_frame, textvariable=self.removal_status_var, wraplength=980).pack(anchor="w", pady=(6, 0))
+
+        # ---- Progress ----
+        progress_frame = ttk.LabelFrame(parent, text="2. Progresso", padding=10)
+        progress_frame.pack(fill="x", pady=(12, 0))
+
+        self.removal_progress_label = ttk.Label(progress_frame, textvariable=self.removal_progress_var)
+        self.removal_progress_label.pack(anchor="w")
+
+        self.removal_progress_bar = ttk.Progressbar(progress_frame, mode="indeterminate", length=400)
+        self.removal_progress_bar.pack(anchor="w", pady=(6, 0))
+
+        action_row = ttk.Frame(progress_frame)
+        action_row.pack(fill="x", pady=(10, 0))
+
+        ttk.Button(action_row, text="▶ Executar remoção", command=self.run_removal, width=20).pack(side="left")
+        ttk.Button(action_row, text="Visualizar relatório apenas", command=self.preview_removal, width=25).pack(side="left", padx=(8, 0))
+
+        # ---- Report ----
+        report_frame = ttk.LabelFrame(parent, text="3. Relatório de remoção", padding=10)
+        report_frame.pack(fill="both", expand=True, pady=(12, 0))
+
+        self.removal_report_text = tk.Text(report_frame, height=12, wrap="word", state="disabled")
+        self.removal_report_text.pack(side="left", fill="both", expand=True)
+
+        scroll2 = ttk.Scrollbar(report_frame, orient="vertical", command=self.removal_report_text.yview)
+        scroll2.pack(side="right", fill="y")
+        self.removal_report_text.configure(yscrollcommand=scroll2.set)
+
+        self._write_removal_report("Aguardando execução...")
+
+    def _write_removal_report(self, text: str) -> None:
+        self.removal_report_text.configure(state="normal")
+        self.removal_report_text.delete("1.0", "end")
+        self.removal_report_text.insert("1.0", text)
+        self.removal_report_text.configure(state="disabled")
+
+    # ---- Removal callbacks ----
+
+    def select_removal_input_folder(self) -> None:
+        folder = filedialog.askdirectory(
+            parent=self.root,
+            title="Selecione a pasta com os arquivos C_*.ini",
+        )
+        if not folder:
+            return
+        self.removal_input_folder_var.set(folder)
+        self.removal_status_var.set(f"Pasta de entrada: {folder}")
+        self._update_removal_status()
+
+    def select_removal_output_folder(self) -> None:
+        folder = filedialog.askdirectory(
+            parent=self.root,
+            title="Selecione a pasta de saída para os arquivos modificados",
+        )
+        if not folder:
+            return
+        self.removal_output_folder_var.set(folder)
+        self.removal_status_var.set(f"Pasta de saída: {folder}")
+
+    def _update_removal_status(self) -> None:
+        folder = self.removal_input_folder_var.get().strip()
+        if not folder:
+            return
+        path = Path(folder)
+        c_files = ["C_Item.ini", "C_ItemMall.ini", "C_Store.ini", "C_DropItem.ini"]
+        present = [f for f in c_files if (path / f).exists()]
+        missing = [f for f in c_files if not (path / f).exists()]
+        status = f"Encontrados: {', '.join(present) if present else 'nenhum'}"
+        if missing:
+            status += f" | Ausentes: {', '.join(missing)}"
+        self.removal_status_var.set(status)
+
+    def _get_removal_files(self) -> tuple[list[Path], list[Path], list[Path], Path]:
+        input_folder = self.removal_input_folder_var.get().strip()
+        output_folder = self.removal_output_folder_var.get().strip()
+        if not input_folder:
+            raise ItemIniError("Selecione a pasta de entrada.")
+        if not output_folder:
+            raise ItemIniError("Selecione a pasta de saída.")
+
+        in_path = Path(input_folder)
+        out_path = Path(output_folder)
+
+        item_files = [
+            in_path / "C_Item.ini",
+            in_path / "C_ItemMall.ini",
+        ]
+        store_files = [
+            in_path / "C_Store.ini",
+        ]
+        drop_files = [
+            in_path / "C_DropItem.ini",
+        ]
+
+        item_files = [f for f in item_files if f.exists()]
+        store_files = [f for f in store_files if f.exists()]
+        drop_files = [f for f in drop_files if f.exists()]
+
+        if not item_files:
+            raise ItemIniError("Nenhum arquivo C_Item ou C_ItemMall encontrado na pasta de entrada.")
+
+        return item_files, store_files, drop_files, out_path
+
+    def run_removal(self) -> None:
+        try:
+            item_files, store_files, drop_files, out_path = self._get_removal_files()
+
+            msg = (
+                f"Serão processados:\n"
+                f"  - {len(item_files)} arquivo(s) de item (C_Item, C_ItemMall)\n"
+                f"  - {len(store_files)} arquivo(s) de loja (C_Store)\n"
+                f"  - {len(drop_files)} arquivo(s) de drop (C_DropItem)\n\n"
+                f"Os arquivos modificados serão salvos em:\n{out_path}\n"
+                "Os originais NÃO serão alterados.\n\n"
+                "Deseja continuar?"
+            )
+            if not messagebox.askyesno("Confirmar remoção", msg, parent=self.root):
+                return
+
+            self.removal_progress_bar.start()
+            self.removal_progress_var.set("Iniciando remoção...")
+            self.root.update_idletasks()
+
+            def progress_callback(msg: str) -> None:
+                self.removal_progress_var.set(msg)
+                self.root.update_idletasks()
+
+            report = process_removal(
+                Path(self.removal_input_folder_var.get()),
+                out_path,
+                progress_callback=progress_callback,
+            )
+
+            self.removal_progress_bar.stop()
+            self.removal_progress_var.set("Concluído!")
+
+            report_text = self._format_removal_report(report)
+            self._write_removal_report(report_text)
+
+            summary = (
+                f"Itens removidos: {report.items_removed_total}\n"
+                f"Refs removidas das lojas: {report.store_refs_removed}\n"
+                f"Refs removidas dos drops: {report.drop_refs_removed}"
+            )
+            messagebox.showinfo("Remoção concluída", summary, parent=self.root)
+
+        except ItemIniError as e:
+            self.removal_progress_bar.stop()
+            self.removal_progress_var.set("Erro")
+            messagebox.showerror("Erro", str(e), parent=self.root)
+        except Exception as e:
+            self.removal_progress_bar.stop()
+            self.removal_progress_var.set("Erro inesperado")
+            messagebox.showerror("Erro inesperado", str(e), parent=self.root)
+
+    # =========================================================================
+    # CORRIGIDO: preview_removal com offset=1 para Drop
+    # =========================================================================
+    def preview_removal(self) -> None:
+        try:
+            item_files, store_files, drop_files, _ = self._get_removal_files()
+
+            all_ids: list[str] = []
+            file_counts: dict[str, int] = {}
+
+            for file_path in item_files:
+                try:
+                    data = file_path.read_bytes()
+                    parsed = parse_item_ini(data, source_label=file_path.name)
+                    count = 0
+                    for record in parsed.records:
+                        if match_removal_criteria(record.fields):
+                            item_id = record.fields[FIELD_INDEX["Id"]].strip()
+                            if item_id:
+                                all_ids.append(item_id)
+                                count += 1
+                    file_counts[file_path.name] = count
+                except Exception as e:
+                    file_counts[file_path.name] = -1
+
+            store_refs = 0
+            drop_refs = 0
+            removed_set = set(all_ids)
+
+            if removed_set:
+                # Store com offset=2
+                for file_path in store_files:
+                    try:
+                        data = file_path.read_bytes()
+                        parsed = parse_item_ini(data, source_label=file_path.name)
+                        group_size = 3
+                        offset = 2
+                        for record in parsed.records:
+                            fields = record.fields
+                            for i in range(offset, len(fields), group_size):
+                                if i + group_size > len(fields):
+                                    break
+                                if fields[i].strip() in removed_set:
+                                    store_refs += 1
+                    except Exception:
+                        pass
+
+                # Drop com offset=1
+                for file_path in drop_files:
+                    try:
+                        data = file_path.read_bytes()
+                        parsed = parse_item_ini(data, source_label=file_path.name)
+                        group_size = 4
+                        offset = 1
+                        for record in parsed.records:
+                            fields = record.fields
+                            for i in range(offset, len(fields), group_size):
+                                if i + group_size > len(fields):
+                                    break
+                                if fields[i].strip() in removed_set:
+                                    drop_refs += 1
+                    except Exception:
+                        pass
+
+            lines = ["=== PRÉ-VISUALIZAÇÃO (nenhum arquivo foi modificado) ===\n"]
+            lines.append("Itens encontrados por arquivo:")
+            for name, count in file_counts.items():
+                if count == -1:
+                    lines.append(f"  {name}: ERRO ao ler")
+                else:
+                    lines.append(f"  {name}: {count} item(ns)")
+            lines.append(f"\nTotal de itens a remover: {len(all_ids)}")
+
+            if all_ids:
+                lines.append(f"\nIDs dos itens a remover ({len(all_ids)}):")
+                for i in range(0, len(all_ids), 10):
+                    chunk = all_ids[i:i+10]
+                    lines.append("  " + ", ".join(chunk))
+                lines.append(f"\nReferências nas lojas: {store_refs}")
+                lines.append(f"Referências nos drops: {drop_refs}")
+            else:
+                lines.append("\nNenhum item atende aos critérios de remoção.")
+
+            self._write_removal_report("\n".join(lines))
+
+        except ItemIniError as e:
+            messagebox.showerror("Erro", str(e), parent=self.root)
+        except Exception as e:
+            messagebox.showerror("Erro inesperado", str(e), parent=self.root)
+
+    def _format_removal_report(self, report: RemovalReport) -> str:
+        lines = ["=== RELATÓRIO DE REMOÇÃO ===\n"]
+
+        lines.append(f"Total de itens removidos: {report.items_removed_total}")
+        lines.append(f"Total de referências removidas das lojas: {report.store_refs_removed}")
+        lines.append(f"Total de referências removidas dos drops: {report.drop_refs_removed}")
+
+        if report.removed_ids:
+            lines.append(f"\nIDs removidos ({len(report.removed_ids)}):")
+            for i in range(0, len(report.removed_ids), 10):
+                chunk = report.removed_ids[i:i+10]
+                lines.append("  " + ", ".join(chunk))
+
+        if report.item_file_counts:
+            lines.append("\nDetalhamento por arquivo:")
+            for name, count in report.item_file_counts.items():
+                lines.append(f"  {name}: {count} item(ns)")
+
+        if report.store_files_processed:
+            lines.append(f"\nArquivos de loja processados: {len(report.store_files_processed)}")
+        if report.drop_files_processed:
+            lines.append(f"Arquivos de drop processados: {len(report.drop_files_processed)}")
+
+        return "\n".join(lines)
+
+    # -------------------------------------------------------------------------
+    # Existing balance methods (unchanged)
+    # -------------------------------------------------------------------------
 
     def _write_report(self, text: str) -> None:
         self.report_text.configure(state="normal")
