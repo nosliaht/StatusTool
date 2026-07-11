@@ -9,6 +9,25 @@ from tkinter import filedialog, messagebox, ttk
 from typing import Callable
 
 # =============================================================================
+# CORES (Tema Escuro Profissional)
+# =============================================================================
+COLORS = {
+    "background": "#0D1117",
+    "header": "#161B22",
+    "card": "#111820",
+    "highlight": "#2FBC72",
+    "text": "#F0F6FC",
+    "text_muted": "#8B949E",
+    "button": "#21262D",
+    "button_text": "#F0F6FC",
+    "button_active": "#2FBC72",
+    "button_active_text": "#07130C",
+    "frame_selected": "#2FBC72",
+    "frame_normal": "#151B23",
+    "border": "#30363D",
+}
+
+# =============================================================================
 # ITEM INDEX (|V.6|194|)
 # =============================================================================
 FIELD_INDEX = {
@@ -254,84 +273,118 @@ ENCHANT_INDEX = {
 }
 
 # =============================================================================
-# CLASS DEFINITIONS GROUPED
+# CLASS DEFINITIONS WITH SUBGROUPS
 # =============================================================================
 CLASS_GROUPS = [
     ("Fighter", [
-        ("Fighter", 0x0002),
-        ("Warrior", 0x0004),
-        ("Berserker", 0x0008),
-        ("Paladin", 0x0010),
-        ("Titan", 0x20000),
-        ("Templar", 0x40000),
-        ("Death Knight", 0x100000000),
-        ("Royal Knight", 0x200000000),
-        ("Destroyer", 0x10000000000),
-        ("Sacred Knight", 0x20000000000),
+        ("Ocupações Básicas", [
+            ("Fighter", 0x0002),
+            ("Warrior", 0x0004),
+        ]),
+        ("Defesa", [
+            ("Paladin", 0x0010),
+            ("Templar", 0x40000),
+            ("Royal Knight", 0x200000000),
+            ("Sacred Knight", 0x20000000000),
+        ]),
+        ("Ataque", [
+            ("Berserker", 0x0008),
+            ("Titan", 0x20000),
+            ("Death Knight", 0x100000000),
+            ("Destroyer", 0x10000000000),
+        ]),
     ]),
     ("Hunter", [
-        ("Hunter", 0x0020),
-        ("Archer", 0x0040),
-        ("Ranger", 0x0080),
-        ("Assassin", 0x0100),
-        ("Sniper", 0x80000),
-        ("Shadow Sicarius", 0x100000),
-        ("Mercenary", 0x400000000),
-        ("Ninja", 0x800000000),
-        ("Predator", 0x40000000000),
-        ("Shinobi", 0x80000000000),
+        ("Ocupações Básicas", [
+            ("Hunter", 0x0020),
+            ("Archer", 0x0040),
+        ]),
+        ("Longo Alcance", [
+            ("Ranger", 0x0080),
+            ("Sniper", 0x80000),
+            ("Mercenary", 0x400000000),
+            ("Predator", 0x40000000000),
+        ]),
+        ("Assassino", [
+            ("Assassin", 0x0100),
+            ("Shadow Sicarius", 0x100000),
+            ("Ninja", 0x800000000),
+            ("Shinobi", 0x80000000000),
+        ]),
     ]),
     ("Acolyte", [
-        ("Acolyte", 0x0200),
-        ("Priest", 0x0400),
-        ("Cleric", 0x0800),
-        ("Sage", 0x1000),
-        ("Prophet", 0x200000),
-        ("Mystic", 0x400000),
-        ("Divine Master", 0x1000000000),
-        ("Shaman", 0x2000000000),
-        ("Archangel", 0x100000000000),
-        ("Druid", 0x200000000000),
+        ("Ocupações Básicas", [
+            ("Acolyte", 0x0200),
+            ("Priest", 0x0400),
+        ]),
+        ("Curativo", [
+            ("Cleric", 0x0800),
+            ("Prophet", 0x200000),
+            ("Divine Master", 0x1000000000),
+            ("Archangel", 0x100000000000),
+        ]),
+        ("Transformação", [
+            ("Sage", 0x1000),
+            ("Mystic", 0x400000),
+            ("Shaman", 0x2000000000),
+            ("Druid", 0x200000000000),
+        ]),
     ]),
     ("Warlock", [
-        ("Warlock", 0x2000),
-        ("Magician", 0x4000),
-        ("Sorcerer", 0x8000),
-        ("Necromancer", 0x10000),
-        ("Archmage", 0x800000),
-        ("Demonologist", 0x1000000),
-        ("Arcane", 0x4000000000),
-        ("Lord of the Dead", 0x8000000000),
-        ("Shinigami", 0x800000000000),
+        ("Ocupações Básicas", [
+            ("Warlock (0x2000)", 0x2000),
+            ("Magician", 0x4000),
+        ]),
+        ("Mágica", [
+            ("Sorcerer", 0x8000),
+            ("Archmage", 0x800000),
+            ("Arcane", 0x4000000000),
+            ("Warlock (0x400000000000)", 0x400000000000),
+        ]),
+        ("Inovação", [
+            ("Necromancer", 0x10000),
+            ("Demonologist", 0x1000000),
+            ("Lord of the Dead", 0x8000000000),
+            ("Shinigami", 0x800000000000),
+        ]),
     ]),
     ("Machinist", [
-        ("Apprentice", 0x2000000),
-        ("Machinist", 0x4000000),
-        ("Aggressor", 0x8000000),
-        ("Demolisher", 0x10000000),
-        ("Prime", 0x20000000),
-        ("Optimus", 0x40000000),
-        ("Megatron", 0x1000000000000),
-        ("Galvatron", 0x2000000000000),
-        ("Omega", 0x4000000000000),
-        ("Celestial Titan", 0x8000000000000),
+        ("Ocupações Básicas", [
+            ("Apprentice", 0x2000000),
+            ("Machinist", 0x4000000),
+        ]),
+        ("Armadura Pesada", [
+            ("Aggressor", 0x8000000),
+            ("Prime", 0x20000000),
+            ("Megatron", 0x1000000000000),
+            ("Omega", 0x4000000000000),
+        ]),
+        ("Armadura Leve", [
+            ("Demolisher", 0x10000000),
+            ("Optimus", 0x40000000),
+            ("Galvatron", 0x2000000000000),
+            ("Celestial Titan", 0x8000000000000),
+        ]),
     ]),
     ("Traveler", [
-        ("Traveler", 0x10000000000000),
-        ("Nomad", 0x20000000000000),
-        ("Swordsman", 0x40000000000000),
-        ("Illusionist", 0x80000000000000),
-        ("Samurai", 0x100000000000000),
-        ("Augur", 0x200000000000000),
-        ("Ronin", 0x400000000000000),
-        ("Oracle", 0x800000000000000),
-        ("Dimensional Master", 0x1000000000000000),
-        ("Chronos", 0x2000000000000000),
+        ("Ocupações Básicas", [
+            ("Traveler", 0x10000000000000),
+            ("Nomad", 0x20000000000000),
+        ]),
+        ("Classe Espacial", [
+            ("Swordsman", 0x40000000000000),
+            ("Samurai", 0x100000000000000),
+            ("Ronin", 0x400000000000000),
+            ("Dimensional Master", 0x1000000000000000),
+        ]),
+        ("Classe do Tempo", [
+            ("Illusionist", 0x80000000000000),
+            ("Augur", 0x200000000000000),
+            ("Oracle", 0x800000000000000),
+            ("Chronos", 0x2000000000000000),
+        ]),
     ]),
 ]
-
-# Flatten for quick access
-ALL_CLASSES = [(name, mask) for group in CLASS_GROUPS for name, mask in group[1]]
 
 # =============================================================================
 # COMMON HELPERS
@@ -368,7 +421,6 @@ INTEGER_PATTERN = re.compile(r"^[+-]?\d+$")
 HEX_PATTERN = re.compile(r"^[0-9A-Fa-f]+$")
 COOLDOWN_SPLIT_PATTERN = re.compile(r"[\s,;|/]+")
 
-# Default class masks for automatic spell removal (level<=30 and these classes)
 DEFAULT_CLASS_MASKS = {
     0x0002, 0x0004, 0x0008, 0x0010, 0x20000, 0x40000, 0x100000000, 0x200000000,
     0x10000000000, 0x20000000000,
@@ -385,7 +437,6 @@ DEFAULT_CLASS_MASKS = {
     0x1000000000000000, 0x2000000000000000,
 }
 
-# Commands that reference spells (including 2139, 2142, 1999, etc.)
 SPELL_COMMANDS = {"1999", "2064", "2065", "2066", "6002", "6003", "2139", "2142"}
 
 # =============================================================================
@@ -915,7 +966,7 @@ def process_item_file(
     return encode_parsed_ini(parsed), report
 
 # =============================================================================
-# ITEM REMOVAL (C_* files) - unchanged
+# ITEM REMOVAL (C_* files)
 # =============================================================================
 def icon_filename_between(value: str, lo: int, hi: int) -> bool:
     val = value.strip()
@@ -1081,7 +1132,7 @@ def process_removal(
     return report
 
 # =============================================================================
-# SPELL REMOVAL - FUNÇÕES AUXILIARES
+# SPELL REMOVAL - AUXILIARY FUNCTIONS
 # =============================================================================
 def parse_spell_ini(data: bytes, source_label: str) -> ParsedIni:
     return parse_ini(data, SPELL_INDEX, source_label=source_label)
@@ -1099,25 +1150,35 @@ def is_root_spell(fields: list[str]) -> bool:
     dep = fields[SPELL_INDEX["LearnDependentSpellId"]].strip()
     return dep == "" or dep == "0"
 
-def spell_meets_criteria(fields: list[str], class_masks: set[int] | None = None) -> bool:
+def spell_meets_criteria(
+    fields: list[str], 
+    class_masks: set[int] | None = None, 
+    absolute_force: bool = False
+) -> bool:
+    cm = parse_class_mask(fields[SPELL_INDEX["RestrictClass"]])
+    if cm is None:
+        return False
+
     if class_masks is not None:
-        cm = parse_class_mask(fields[SPELL_INDEX["RestrictClass"]])
-        if cm is None:
-            return False
-        return any(cm & mask for mask in class_masks)
+        selected_sum = sum(class_masks)
+        if absolute_force:
+            # Deve bater exatamente o valor combinado final
+            return cm == selected_sum
+        else:
+            # Deve ser um subconjunto estrito da seleção de classes, e não zero
+            return (cm & ~selected_sum) == 0 and cm != 0
     else:
+        # Filtro padrão
         level = parse_int_field(fields[SPELL_INDEX["RestrictLeve"]])
         if level is None or level > 30:
-            return False
-        cm = parse_class_mask(fields[SPELL_INDEX["RestrictClass"]])
-        if cm is None:
             return False
         return any(cm & mask for mask in DEFAULT_CLASS_MASKS)
 
 def collect_spell_ids_to_remove(
     data: bytes,
     force_root_id: str | None = None,
-    class_masks: set[int] | None = None
+    class_masks: set[int] | None = None,
+    absolute_force: bool = False
 ) -> tuple[set[str], list[str]]:
     parsed = parse_spell_ini(data, "spell file")
     id_to_fields: dict[str, list[str]] = {}
@@ -1129,37 +1190,68 @@ def collect_spell_ids_to_remove(
     if force_root_id:
         if force_root_id not in id_to_fields:
             raise ItemIniError(f"Spell ID {force_root_id} não encontrado.")
-        roots = {force_root_id}
-    else:
-        roots: set[str] = set()
+        dep_map: dict[str, list[str]] = {}
         for sid, fields in id_to_fields.items():
-            if not is_root_spell(fields):
-                continue
-            if spell_meets_criteria(fields, class_masks):
-                roots.add(sid)
+            dep = fields[SPELL_INDEX["LearnDependentSpellId"]].strip()
+            if dep and dep in id_to_fields:
+                dep_map.setdefault(dep, []).append(sid)
+        to_remove = set()
+        def add_chain(spell_id: str) -> None:
+            if spell_id in to_remove:
+                return
+            to_remove.add(spell_id)
+            for child in dep_map.get(spell_id, []):
+                add_chain(child)
+        add_chain(force_root_id)
+        return to_remove, sorted(to_remove)
 
-    if not roots:
+    candidates = set()
+    for sid, fields in id_to_fields.items():
+        if spell_meets_criteria(fields, class_masks, absolute_force):
+            candidates.add(sid)
+
+    if not candidates:
         return set(), []
 
-    to_remove: set[str] = set()
+    # RECONSTRUÇÃO DA LÓGICA DE HERANÇA:
+    # Se o filtro de classe estiver ativo, NÃO subimos para os ancestrais,
+    # pois isso removeria habilidades base partilhadas por outras classes (ex: Berserker no exemplo).
+    # Caso contrário (filtro padrão de nível), mantemos a subida original de ancestrais.
+    if class_masks is not None:
+        to_remove = set(candidates)
+    else:
+        parent_map = {}
+        for sid, fields in id_to_fields.items():
+            dep = fields[SPELL_INDEX["LearnDependentSpellId"]].strip()
+            if dep and dep in id_to_fields:
+                parent_map[sid] = dep
+
+        ancestors = set(candidates)
+        for cid in list(candidates):
+            current = cid
+            while current in parent_map:
+                parent = parent_map[current]
+                ancestors.add(parent)
+                current = parent
+        to_remove = set(ancestors)
+
+    # A expansão para descendentes (filhos) permanece sempre ativa.
+    # Se um elo da corrente é removido, os upgrades seguintes não podem ser aprendidos.
     dep_map: dict[str, list[str]] = {}
     for sid, fields in id_to_fields.items():
         dep = fields[SPELL_INDEX["LearnDependentSpellId"]].strip()
         if dep and dep in id_to_fields:
             dep_map.setdefault(dep, []).append(sid)
 
-    def add_chain(spell_id: str) -> None:
-        if spell_id in to_remove:
-            return
-        to_remove.add(spell_id)
-        for child in dep_map.get(spell_id, []):
-            add_chain(child)
+    to_process = list(to_remove)
+    while to_process:
+        current = to_process.pop()
+        for child in dep_map.get(current, []):
+            if child not in to_remove:
+                to_remove.add(child)
+                to_process.append(child)
 
-    for root in roots:
-        add_chain(root)
-
-    id_list = sorted(to_remove) if to_remove else []
-    return to_remove, id_list
+    return to_remove, sorted(to_remove)
 
 def build_dependency_map(data: bytes) -> dict[str, list[str]]:
     parsed = parse_spell_ini(data, "spell file")
@@ -1196,7 +1288,6 @@ def remove_spells_from_file(data: bytes, ids_to_remove: set[str]) -> bytes:
     return encode_spell_ini(parsed)
 
 def get_all_buff_enchants(spell_data: bytes) -> set[str]:
-    """Retorna todos os enchants que são usados como buff (EnchantId ou SelfEnchantId) por qualquer spell."""
     parsed = parse_spell_ini(spell_data, "spell file")
     buffs = set()
     for record in parsed.records:
@@ -1212,7 +1303,6 @@ def get_protected_enchants_from_spells(
     spell_data: bytes,
     spells_to_remove: set[str]
 ) -> set[str]:
-    """Retorna enchants que são buffs de spells que NÃO estão em spells_to_remove."""
     parsed = parse_spell_ini(spell_data, "spell file")
     protected: set[str] = set()
     for record in parsed.records:
@@ -1315,25 +1405,16 @@ def find_items_using_enchants(data: bytes, enchant_ids: set[str]) -> tuple[set[s
                 id_list.append(item_id)
     return items_to_remove, id_list
 
-# =============================================================================
-# NOVA FUNÇÃO: REFINAMENTO DE ENCHANTS A REMOVER
-# =============================================================================
 def refine_enchants_to_remove(
     enchant_data: bytes,
     candidates: set[str],
     protected_enchants: set[str]
 ) -> set[str]:
-    """
-    Remove de 'candidates' qualquer enchant que seja referenciado por outro enchant
-    que NÃO esteja em candidates (ou seja, por um enchant que permanecerá).
-    Isso evita remover enchants que ainda são usados por outros enchants que ficarão.
-    """
     if not candidates:
         return set()
 
-    # Construir mapa de referências: quem referencia quem via 7001
     parsed = parse_enchant_ini(enchant_data, "enchant file")
-    ref_map: dict[str, set[str]] = {}  # enchant -> conjunto de enchants que o referenciam
+    ref_map: dict[str, set[str]] = {}
     for record in parsed.records:
         fields = record.fields
         eid = fields[ENCHANT_INDEX["Id"]].strip()
@@ -1347,16 +1428,12 @@ def refine_enchants_to_remove(
             if ref_ench:
                 ref_map.setdefault(ref_ench, set()).add(eid)
 
-    # Iterativamente remover de candidates aqueles que têm referenciadores externos
     to_remove = set(candidates)
     changed = True
     while changed:
         changed = False
-        # Verificar cada candidato
         for ench in list(to_remove):
             referencers = ref_map.get(ench, set())
-            # Se algum referenciador NÃO está em to_remove (e não é protegido, mas protegidos já não estão em candidates),
-            # então este ench não pode ser removido.
             external_ref = any(ref not in to_remove for ref in referencers)
             if external_ref:
                 to_remove.remove(ench)
@@ -1364,7 +1441,7 @@ def refine_enchants_to_remove(
     return to_remove
 
 # =============================================================================
-# PROCESSO PRINCIPAL DE REMOÇÃO DE SPELLS
+# PRINCIPAL SPELL REMOVAL PROCESS
 # =============================================================================
 def process_spell_removal(
     input_folder: Path,
@@ -1374,6 +1451,7 @@ def process_spell_removal(
     force_root_id: str | None = None,
     class_masks: set[int] | None = None,
     keep_spells: bool = False,
+    absolute_force: bool = False,
 ) -> SpellRemovalReport:
     report = SpellRemovalReport()
     output_folder.mkdir(parents=True, exist_ok=True)
@@ -1405,11 +1483,15 @@ def process_spell_removal(
             progress_callback(f"Coletando cadeia a partir do ID {force_root_id}...")
         else:
             if class_masks:
-                progress_callback(f"Coletando spells com filtro de classe (ignorando nível)...")
+                mode_str = "Filtro absoluto" if absolute_force else "Filtro subconjunto"
+                progress_callback(f"Coletando spells por classe ({mode_str})...")
             else:
                 progress_callback("Coletando spells (nível<=30 e classes padrão)...")
 
-    ids_to_remove, id_list = collect_spell_ids_to_remove(spell_data, force_root_id, class_masks)
+    ids_to_remove, id_list = collect_spell_ids_to_remove(
+        spell_data, force_root_id, class_masks, absolute_force
+    )
+
     if not ids_to_remove:
         if progress_callback:
             progress_callback("Nenhuma spell alvo encontrada.")
@@ -1425,13 +1507,12 @@ def process_spell_removal(
         report.enchant_files_processed.append(enchant_file)
         return report
 
-    expanded_spells = expand_chain(ids_to_remove, dep_map)
-    spells_to_remove = expanded_spells
+    # Aqui já temos a cadeia expandida corretamente (com ou sem ancestral conforme as novas regras)
+    spells_to_remove = ids_to_remove
 
     if progress_callback:
         progress_callback(f"Spells a remover (cadeia expandida): {len(spells_to_remove)}")
 
-    # --- Determinar enchants protegidos ---
     if keep_spells:
         protected_enchants = get_all_buff_enchants(spell_data)
         if progress_callback:
@@ -1441,14 +1522,10 @@ def process_spell_removal(
         if progress_callback:
             progress_callback(f"Enchants protegidos (buffs de spells não removidas): {len(protected_enchants)}")
 
-    # --- Coletar candidatos a remoção (enchants que referenciam spells alvo) ---
     candidates, _ = find_enchants_referencing_spells(enchant_data, spells_to_remove, protected_enchants)
 
-    # --- Adicionar enchants que referenciam esses candidatos (via 7001) ---
     all_candidates = set(candidates)
-    iteration = 0
     while True:
-        iteration += 1
         new_from_ench, _ = find_enchants_referencing_enchants(enchant_data, all_candidates, protected_enchants)
         new_found = new_from_ench - all_candidates
         if not new_found:
@@ -1458,16 +1535,12 @@ def process_spell_removal(
     if progress_callback:
         progress_callback(f"Candidatos a remoção (incluindo referências encadeadas): {len(all_candidates)}")
 
-    # --- Refinar: remover candidatos que são referenciados por enchants que permanecerão ---
     refined = refine_enchants_to_remove(enchant_data, all_candidates, protected_enchants)
-
-    # --- Garantir que protegidos nunca sejam removidos ---
     refined -= protected_enchants
 
     if progress_callback:
         progress_callback(f"Após refinamento: {len(refined)} enchants a remover")
 
-    # --- Remover spells que referenciam enchants removidos (apenas se não for keep_spells) ---
     spells_removed_by_ench_ref = set()
     spells_removed_by_ench_ref_ids = []
     if refined and not keep_spells:
@@ -1484,7 +1557,6 @@ def process_spell_removal(
                 if progress_callback:
                     progress_callback(f"  Adicionadas {len(spells_removed_by_ench_ref)} novas spells por referência a enchants.")
 
-    # --- Remover spells (se não for keep_spells) ---
     if keep_spells:
         if progress_callback:
             progress_callback("Modo 'apenas referências': NENHUMA spell será removida.")
@@ -1498,12 +1570,10 @@ def process_spell_removal(
         spells_removed_count = len(spells_to_remove)
         spells_removed_ids = sorted(spells_to_remove)
 
-    # --- Remover enchants ---
     if progress_callback:
         progress_callback(f"Removendo {len(refined)} enchants...")
     current_enchant_data = remove_enchants_from_file(enchant_data, refined)
 
-    # --- Remover itens que usam enchants removidos ---
     all_item_ids_to_remove = set()
     item_id_list = []
     if refined and item_data:
@@ -1553,7 +1623,6 @@ def process_spell_removal(
         for name, data in item_data.items():
             (output_folder / name).write_bytes(data)
 
-    # --- Salvar arquivos finais ---
     out_spell = output_folder / "C_Spell.ini"
     out_spell.write_bytes(current_spell_data)
     report.spell_files_processed.append(spell_file)
@@ -1578,7 +1647,57 @@ def process_spell_removal(
     return report
 
 # =============================================================================
-# GUI APPLICATION – LAYOUT REFORMULADO (1080x720, FIXO, SEM MAXIMIZAR)
+# SPELL CHAIN LOOKUP
+# =============================================================================
+def get_spell_chain(spell_id: str, spell_data: bytes) -> list[dict]:
+    parsed = parse_spell_ini(spell_data, "spell file")
+    id_to_fields: dict[str, list[str]] = {}
+    for record in parsed.records:
+        sid = record.fields[SPELL_INDEX["Id"]].strip()
+        if sid:
+            id_to_fields[sid] = record.fields
+
+    if spell_id not in id_to_fields:
+        return []
+
+    parent_map: dict[str, str] = {}
+    children_map: dict[str, list[str]] = {}
+    for sid, fields in id_to_fields.items():
+        dep = fields[SPELL_INDEX["LearnDependentSpellId"]].strip()
+        if dep and dep in id_to_fields:
+            parent_map[sid] = dep
+            children_map.setdefault(dep, []).append(sid)
+
+    root = spell_id
+    while root in parent_map:
+        root = parent_map[root]
+
+    chain = []
+    queue = [root]
+    visited = set()
+    while queue:
+        sid = queue.pop(0)
+        if sid in visited:
+            continue
+        visited.add(sid)
+        fields = id_to_fields.get(sid, [])
+        chain.append({
+            'id': sid,
+            'name': fields[SPELL_INDEX["Name"]] if len(fields) > SPELL_INDEX["Name"] else "",
+            'level': fields[SPELL_INDEX["RestrictLeve"]] if len(fields) > SPELL_INDEX["RestrictLeve"] else "",
+            'class_mask': fields[SPELL_INDEX["RestrictClass"]] if len(fields) > SPELL_INDEX["RestrictClass"] else "",
+            'enchant_id': fields[SPELL_INDEX["EnchantId"]] if len(fields) > SPELL_INDEX["EnchantId"] else "",
+            'self_enchant_id': fields[SPELL_INDEX["SelfEnchantId"]] if len(fields) > SPELL_INDEX["SelfEnchantId"] else "",
+            'dep': fields[SPELL_INDEX["LearnDependentSpellId"]] if len(fields) > SPELL_INDEX["LearnDependentSpellId"] else "",
+        })
+        for child in children_map.get(sid, []):
+            if child not in visited:
+                queue.append(child)
+
+    return chain
+
+# =============================================================================
+# INTERACTIVE GUI APPLICATION
 # =============================================================================
 class ItemBalancerApp:
     ROUND_LABELS = {
@@ -1596,12 +1715,13 @@ class ItemBalancerApp:
 
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
-        self.root.title("INI Toolkit — Balanceador + Remoção de Itens/Spells")
-        self.root.geometry("1080x720")
-        self.root.resizable(False, False)
-        self.root.configure(bg="#f0f0f0")
+        self.root.title("INI Toolkit — Balanceador + Gestor de Remoção")
+        self.root.geometry("1150x880")
+        self.root.configure(bg=COLORS["background"])
+        self.root.option_add("*Background", COLORS["background"])
+        self.root.option_add("*Foreground", COLORS["text"])
 
-        # Balance tab variables
+        # Balance variables
         self.input_path: Path | None = None
         self.base_path: Path | None = None
 
@@ -1621,89 +1741,123 @@ class ItemBalancerApp:
 
         self.file_var = tk.StringVar(value="INI principal: nenhum arquivo selecionado.")
         self.base_file_var = tk.StringVar(value="INI base de enchants: nenhum arquivo selecionado.")
-        self.status_var = tk.StringVar(value="Configure as opções, escolha os arquivos e processe.")
+        self.status_var = tk.StringVar(value="Configure as opções, selecione os arquivos e processe.")
 
-        # Item removal tab variables
+        # Item removal variables
         self.removal_input_folder_var = tk.StringVar(value="")
         self.removal_output_folder_var = tk.StringVar(value="")
         self.removal_status_var = tk.StringVar(value="Nenhuma pasta selecionada.")
         self.removal_progress_var = tk.StringVar(value="Aguardando...")
 
-        # Spell removal tab variables
+        # Spell removal variables
         self.spell_input_folder_var = tk.StringVar(value="")
         self.spell_output_folder_var = tk.StringVar(value="")
         self.spell_status_var = tk.StringVar(value="Nenhuma pasta selecionada.")
         self.spell_progress_var = tk.StringVar(value="Aguardando...")
         self.spell_force_id_var = tk.StringVar(value="")
         self.spell_keep_spells_var = tk.BooleanVar(value=False)
+        self.spell_absolute_force_var = tk.BooleanVar(value=False)
 
-        # Class selection variables (grouped)
-        self.spell_class_groups: list[dict] = []
+        # Class variables structure mapping
+        self.class_vars_map: dict[str, list[tuple[str, list[tuple[str, tk.BooleanVar, int]]]]] = {}
         self._create_class_vars()
+
+        # Chain visualization variables
+        self.chain_spell_id_var = tk.StringVar(value="")
+        self.chain_widgets: list[tuple[ttk.Checkbutton, ttk.Label, dict]] = []
 
         self._setup_styles()
         self._build_interface()
 
     def _create_class_vars(self) -> None:
-        for group_name, classes in CLASS_GROUPS:
-            group_dict = {'name': group_name, 'classes': []}
-            for class_name, mask in classes:
-                var = tk.BooleanVar(value=False)
-                group_dict['classes'].append((class_name, var, mask))
-            self.spell_class_groups.append(group_dict)
+        for group_name, subgroups in CLASS_GROUPS:
+            group_data = []
+            for subgroup_name, classes in subgroups:
+                class_list = []
+                for class_name, mask in classes:
+                    var = tk.BooleanVar(value=False)
+                    # Força atualização em tempo real ao alterar valores
+                    var.trace_add("write", lambda *args: self._update_flag_display())
+                    class_list.append((class_name, var, mask))
+                group_data.append((subgroup_name, class_list))
+            self.class_vars_map[group_name] = group_data
 
     def _setup_styles(self) -> None:
         style = ttk.Style(self.root)
         if "clam" in style.theme_names():
             style.theme_use("clam")
-        style.configure("TFrame", background="#f0f0f0")
-        style.configure("TLabel", background="#f0f0f0", foreground="#333")
-        style.configure("TLabelframe", background="#f0f0f0", foreground="#333")
-        style.configure("TLabelframe.Label", background="#f0f0f0", foreground="#333")
-        style.configure("TButton", background="#e0e0e0", foreground="#333")
+
+        style.configure("TFrame", background=COLORS["background"])
+        style.configure("TLabel", background=COLORS["background"], foreground=COLORS["text"])
+        style.configure("TLabelframe", background=COLORS["background"], foreground=COLORS["text"], borderwidth=1, relief="solid")
+        style.configure("TLabelframe.Label", background=COLORS["background"], foreground=COLORS["highlight"], font=("Segoe UI", 10, "bold"))
+        
+        # Estilo dos botões padrões
+        style.configure("TButton", background=COLORS["button"], foreground=COLORS["button_text"],
+                       borderwidth=1, relief="flat", focuscolor="none", font=("Segoe UI", 9))
         style.map("TButton",
-                  background=[("active", "#d0d0d0"), ("pressed", "#c0c0c0")])
-        style.configure("Accent.TButton", background="#4a7db5", foreground="white")
-        style.map("Accent.TButton",
-                  background=[("active", "#3a6da5"), ("pressed", "#2a5d95")])
-        style.configure("TNotebook", background="#f0f0f0")
-        style.configure("TNotebook.Tab", background="#e8e8e8", foreground="#333")
+                  background=[("active", COLORS["button_active"])],
+                  foreground=[("active", COLORS["button_active_text"])])
+        
+        # Botões de destaque
+        style.configure("Accent.TButton", background=COLORS["highlight"], foreground=COLORS["button_active_text"], font=("Segoe UI", 9, "bold"))
+        style.map("Accent.TButton", background=[("active", COLORS["button_active"])])
+        
+        # Botões do menu de grupo (sidebar)
+        style.configure("Sidebar.TButton", background=COLORS["card"], foreground=COLORS["text_muted"], borderwidth=0, font=("Segoe UI", 10))
+        style.map("Sidebar.TButton",
+                  background=[("selected", COLORS["button_active"]), ("active", COLORS["button"])],
+                  foreground=[("selected", COLORS["button_active_text"]), ("active", COLORS["text"])])
+
+        style.configure("TNotebook", background=COLORS["background"])
+        style.configure("TNotebook.Tab", background=COLORS["header"], foreground=COLORS["text_muted"], font=("Segoe UI", 9, "bold"), padding=[12, 4])
         style.map("TNotebook.Tab",
-                  background=[("selected", "#ffffff")])
-        style.configure("TCheckbutton", background="#f0f0f0", foreground="#333")
+                  background=[("selected", COLORS["highlight"])],
+                  foreground=[("selected", COLORS["button_active_text"])])
+        
+        style.configure("TCheckbutton", background=COLORS["background"], foreground=COLORS["text"])
+        style.configure("TEntry", fieldbackground=COLORS["card"], foreground=COLORS["text"], insertcolor=COLORS["text"], borderwidth=1)
+        style.configure("TCombobox", fieldbackground=COLORS["card"], foreground=COLORS["text"])
+        style.configure("Treeview", background=COLORS["card"], foreground=COLORS["text"], fieldbackground=COLORS["card"], borderwidth=0)
+        style.map("Treeview", background=[("selected", COLORS["highlight"])])
 
     def _build_interface(self) -> None:
         notebook = ttk.Notebook(self.root, padding=0)
-        notebook.pack(fill="both", expand=True, padx=6, pady=6)
+        notebook.pack(fill="both", expand=True, padx=8, pady=8)
 
-        # Balance tab
+        # Tab Balanceamento
         balance_frame = ttk.Frame(notebook, padding=8)
         notebook.add(balance_frame, text="Balanceamento")
         self._build_balance_tab(balance_frame)
 
-        # Item removal tab
+        # Tab Remoção de Itens
         removal_frame = ttk.Frame(notebook, padding=8)
         notebook.add(removal_frame, text="Remoção de Itens")
         self._build_removal_tab(removal_frame)
 
-        # Spell removal tab
+        # Tab Remoção de Spells (Layout Reformulado)
         spell_frame = ttk.Frame(notebook, padding=8)
         notebook.add(spell_frame, text="Remoção de Spells")
         self._build_spell_tab(spell_frame)
 
-        # Status bar
-        status_bar = ttk.Frame(self.root, relief="sunken", padding=4)
-        status_bar.pack(fill="x", side="bottom", padx=6, pady=(0, 6))
-        ttk.Label(status_bar, textvariable=self.status_var, wraplength=1050).pack(anchor="w")
+        # Tab Visualização de Cadeia
+        chain_frame = ttk.Frame(notebook, padding=8)
+        notebook.add(chain_frame, text="Visualização de Cadeia")
+        self._build_chain_tab(chain_frame)
+
+        # Status Bar inferior
+        status_bar = ttk.Frame(self.root, relief="flat", padding=4)
+        status_bar.pack(fill="x", side="bottom", padx=8, pady=(0, 8))
+        ttk.Label(status_bar, textvariable=self.status_var, wraplength=1100).pack(anchor="w")
 
     # -------------------------------------------------------------------------
-    # Balance Tab (unchanged)
+    # Balance Tab
     # -------------------------------------------------------------------------
     def _build_balance_tab(self, parent: ttk.Frame) -> None:
         file_frame = ttk.LabelFrame(parent, text="Arquivos", padding=8)
         file_frame.pack(fill="x", pady=(0, 8))
-        ttk.Label(file_frame, textvariable=self.file_var, wraplength=1000).pack(anchor="w")
-        ttk.Label(file_frame, textvariable=self.base_file_var, wraplength=1000).pack(anchor="w", pady=(2, 0))
+        ttk.Label(file_frame, textvariable=self.file_var, wraplength=1050).pack(anchor="w")
+        ttk.Label(file_frame, textvariable=self.base_file_var, wraplength=1050).pack(anchor="w", pady=(2, 0))
         btn_row = ttk.Frame(file_frame)
         btn_row.pack(fill="x", pady=(6, 0))
         ttk.Button(btn_row, text="Selecionar INI principal", command=self.select_file).pack(side="left")
@@ -1746,7 +1900,8 @@ class ItemBalancerApp:
         report_frame = ttk.LabelFrame(parent, text="Relatório", padding=6)
         report_frame.pack(fill="both", expand=True)
         self.report_text = tk.Text(report_frame, height=10, wrap="word", state="disabled",
-                                   bg="#ffffff", fg="#333", font=("Segoe UI", 9))
+                                   bg=COLORS["card"], fg=COLORS["text"], font=("Segoe UI", 9),
+                                   relief="flat", borderwidth=0)
         self.report_text.pack(side="left", fill="both", expand=True)
         scroll = ttk.Scrollbar(report_frame, orient="vertical", command=self.report_text.yview)
         scroll.pack(side="right", fill="y")
@@ -1754,7 +1909,7 @@ class ItemBalancerApp:
         self._write_report("Pronto. Selecione os arquivos e regras para começar.")
 
     # -------------------------------------------------------------------------
-    # Item Removal Tab (unchanged)
+    # Item Removal Tab
     # -------------------------------------------------------------------------
     def _build_removal_tab(self, parent: ttk.Frame) -> None:
         folder_frame = ttk.LabelFrame(parent, text="Pastas", padding=8)
@@ -1771,7 +1926,7 @@ class ItemBalancerApp:
         ttk.Entry(out_row, textvariable=self.removal_output_folder_var, width=60).pack(side="left", padx=(6, 6))
         ttk.Button(out_row, text="Selecionar", command=self.select_removal_output_folder).pack(side="left")
 
-        ttk.Label(folder_frame, textvariable=self.removal_status_var, wraplength=1020).pack(anchor="w", pady=(4, 0))
+        ttk.Label(folder_frame, textvariable=self.removal_status_var, wraplength=1050).pack(anchor="w", pady=(4, 0))
 
         action_frame = ttk.LabelFrame(parent, text="Ações", padding=6)
         action_frame.pack(fill="x", pady=(0, 8))
@@ -1783,7 +1938,8 @@ class ItemBalancerApp:
         report_frame = ttk.LabelFrame(parent, text="Relatório", padding=6)
         report_frame.pack(fill="both", expand=True)
         self.removal_report_text = tk.Text(report_frame, height=8, wrap="word", state="disabled",
-                                           bg="#ffffff", fg="#333", font=("Segoe UI", 9))
+                                           bg=COLORS["card"], fg=COLORS["text"], font=("Segoe UI", 9),
+                                           relief="flat", borderwidth=0)
         self.removal_report_text.pack(side="left", fill="both", expand=True)
         scroll = ttk.Scrollbar(report_frame, orient="vertical", command=self.removal_report_text.yview)
         scroll.pack(side="right", fill="y")
@@ -1791,39 +1947,215 @@ class ItemBalancerApp:
         self._write_removal_report("Aguardando execução...")
 
     # -------------------------------------------------------------------------
-    # Spell Removal Tab (unchanged UI)
+    # Spell Removal Tab (LAYOUT REFORMULADO)
     # -------------------------------------------------------------------------
     def _build_spell_tab(self, parent: ttk.Frame) -> None:
-        folder_frame = ttk.LabelFrame(parent, text="Pastas e ID específico", padding=8)
-        folder_frame.pack(fill="x", pady=(0, 8))
-        in_row = ttk.Frame(folder_frame)
-        in_row.pack(fill="x", pady=2)
-        ttk.Label(in_row, text="Entrada:").pack(side="left")
-        ttk.Entry(in_row, textvariable=self.spell_input_folder_var, width=50).pack(side="left", padx=(6, 6))
-        ttk.Button(in_row, text="Selecionar", command=self.select_spell_input_folder).pack(side="left")
+        # Configurações de pastas e IDs
+        top_frame = ttk.LabelFrame(parent, text="Configurações de Arquivos", padding=8)
+        top_frame.pack(fill="x", pady=(0, 8))
 
-        out_row = ttk.Frame(folder_frame)
-        out_row.pack(fill="x", pady=2)
-        ttk.Label(out_row, text="Saída:").pack(side="left")
-        ttk.Entry(out_row, textvariable=self.spell_output_folder_var, width=50).pack(side="left", padx=(6, 6))
-        ttk.Button(out_row, text="Selecionar", command=self.select_spell_output_folder).pack(side="left")
+        row1 = ttk.Frame(top_frame)
+        row1.pack(fill="x", pady=2)
+        ttk.Label(row1, text="Entrada:").pack(side="left")
+        ttk.Entry(row1, textvariable=self.spell_input_folder_var, width=50).pack(side="left", padx=(6, 6))
+        ttk.Button(row1, text="Selecionar", command=self.select_spell_input_folder).pack(side="left", padx=2)
+        ttk.Label(row1, text="  Saída:").pack(side="left", padx=(10, 0))
+        ttk.Entry(row1, textvariable=self.spell_output_folder_var, width=50).pack(side="left", padx=(6, 6))
+        ttk.Button(row1, text="Selecionar", command=self.select_spell_output_folder).pack(side="left", padx=2)
 
-        force_row = ttk.Frame(folder_frame)
-        force_row.pack(fill="x", pady=2)
-        ttk.Label(force_row, text="ID específico:").pack(side="left")
-        ttk.Entry(force_row, textvariable=self.spell_force_id_var, width=12).pack(side="left", padx=(6, 6))
-        ttk.Label(force_row, text="(deixe em branco para filtro por classe)").pack(side="left", padx=(6, 0))
+        row2 = ttk.Frame(top_frame)
+        row2.pack(fill="x", pady=(6, 2))
+        ttk.Label(row2, text="ID específico:").pack(side="left")
+        ttk.Entry(row2, textvariable=self.spell_force_id_var, width=12).pack(side="left", padx=(6, 6))
+        ttk.Label(row2, text="(Deixe vazio para usar filtro de classe)").pack(side="left", padx=(4, 20))
+        
+        ttk.Checkbutton(row2, variable=self.spell_keep_spells_var,
+                        text="Apenas remover referências (Mantém as spells no arquivo)").pack(side="left", padx=(10, 10))
+        ttk.Checkbutton(row2, variable=self.spell_absolute_force_var,
+                        text="Forçar Absoluto (Máscara idêntica à soma selecionada)").pack(side="left")
 
-        keep_row = ttk.Frame(folder_frame)
-        keep_row.pack(fill="x", pady=2)
-        ttk.Checkbutton(keep_row, variable=self.spell_keep_spells_var,
-                        text="Apenas remover referências (não remover spells)").pack(anchor="w")
-
-        class_frame = ttk.LabelFrame(parent, text="Filtro por classes (selecionar para ignorar nível)", padding=6)
+        # Painel de Seleção de Classes (Layout Lateral Estilo Tool Profissional)
+        class_frame = ttk.LabelFrame(parent, text="Filtro de Classes para Remoção", padding=6)
         class_frame.pack(fill="x", pady=(0, 8))
 
-        canvas = tk.Canvas(class_frame, height=160, bg="#f0f0f0", highlightthickness=0)
-        scrollbar = ttk.Scrollbar(class_frame, orient="vertical", command=canvas.yview)
+        # Indicador de flags atuais
+        flag_status_frame = ttk.Frame(class_frame)
+        flag_status_frame.pack(fill="x", pady=(0, 4))
+        ttk.Label(flag_status_frame, text="Valor da flag calculada: ", font=("Segoe UI", 9, "bold")).pack(side="left")
+        
+        self.flag_global_decimal = tk.StringVar(value="0")
+        self.flag_global_hex = tk.StringVar(value="0x0")
+        
+        ttk.Entry(flag_status_frame, textvariable=self.flag_global_decimal, width=16, state="readonly").pack(side="left", padx=4)
+        ttk.Entry(flag_status_frame, textvariable=self.flag_global_hex, width=12, state="readonly").pack(side="left", padx=4)
+
+        # Botões de ação globais
+        ttk.Button(flag_status_frame, text="Marcar Todas", command=self._select_all_classes).pack(side="left", padx=(15, 4))
+        ttk.Button(flag_status_frame, text="Limpar Todas", command=self._clear_all_classes).pack(side="left", padx=2)
+        ttk.Button(flag_status_frame, text="Importar Flag", command=self._check_flag_dialog).pack(side="left", padx=2)
+
+        # Divisor Lateral: Lista de Categorias à Esquerda, Detalhes à Direita
+        paned = ttk.Frame(class_frame)
+        paned.pack(fill="x", pady=4)
+
+        # Sidebar à esquerda (Grupos principais)
+        self.sidebar_frame = ttk.Frame(paned, width=150)
+        self.sidebar_frame.pack(side="left", fill="y", padx=(0, 6))
+
+        # Detalhes das subprofissões à direita
+        self.subgroup_panel = ttk.Frame(paned, height=180, relief="solid", borderwidth=1)
+        self.subgroup_panel.pack(side="left", fill="both", expand=True)
+
+        # Construir botões da barra lateral
+        self.sidebar_buttons: dict[str, ttk.Button] = {}
+        for group_name in self.class_vars_map.keys():
+            btn = ttk.Button(
+                self.sidebar_frame, 
+                text=group_name, 
+                command=lambda g=group_name: self._show_class_group(g)
+            )
+            btn.pack(fill="x", pady=1, ipady=3)
+            self.sidebar_buttons[group_name] = btn
+
+        # Exibe por padrão a primeira categoria
+        first_group = list(self.class_vars_map.keys())[0]
+        self._show_class_group(first_group)
+
+        # Informação de Status da aba Spell
+        ttk.Label(parent, textvariable=self.spell_status_var, font=("Segoe UI", 9, "italic")).pack(anchor="w", pady=2)
+
+        # Seção de Ações
+        action_frame = ttk.Frame(parent)
+        action_frame.pack(fill="x", pady=(0, 6))
+        ttk.Button(action_frame, text="▶ Executar remoção de spells", command=self.run_spell_removal, style="Accent.TButton").pack(side="left", padx=(0, 8))
+        ttk.Button(action_frame, text="Visualizar relatório", command=self.preview_spell_removal).pack(side="left")
+
+        # Exibição do Relatório
+        report_frame = ttk.LabelFrame(parent, text="Relatório do Processamento", padding=6)
+        report_frame.pack(fill="both", expand=True)
+        self.spell_report_text = tk.Text(report_frame, height=10, wrap="word", state="disabled",
+                                         bg=COLORS["card"], fg=COLORS["text"], font=("Segoe UI", 9),
+                                         relief="flat", borderwidth=0)
+        self.spell_report_text.pack(side="left", fill="both", expand=True)
+        scroll = ttk.Scrollbar(report_frame, orient="vertical", command=self.spell_report_text.yview)
+        scroll.pack(side="right", fill="y")
+        self.spell_report_text.configure(yscrollcommand=scroll.set)
+        self._write_spell_report("Aguardando execução...")
+
+    # ---- MÉTODOS DE CONTROLE DA SELEÇÃO DE CLASSES ----
+    def _show_class_group(self, group_name: str) -> None:
+        # Destruir widgets anteriores no painel de subgrupos
+        for widget in self.subgroup_panel.winfo_children():
+            widget.destroy()
+
+        # Atualizar destaque visual dos botões da sidebar
+        for name, btn in self.sidebar_buttons.items():
+            if name == group_name:
+                btn.state(['pressed'])
+            else:
+                btn.state(['!pressed'])
+
+        # Obter os dados do grupo selecionado
+        subgroups = self.class_vars_map[group_name]
+
+        # Layout em grid dinâmico para os subgrupos
+        col_idx = 0
+        for sub_name, classes in subgroups:
+            sub_frame = ttk.Frame(self.subgroup_panel, padding=6)
+            sub_frame.grid(row=0, column=col_idx, sticky="nws", padx=10)
+            
+            # Título do subgrupo
+            lbl = ttk.Label(sub_frame, text=sub_name, font=("Segoe UI", 9, "bold"), foreground=COLORS["highlight"])
+            lbl.pack(anchor="w", pady=(0, 4))
+
+            # Renderiza as classes deste subgrupo
+            for class_name, var, mask in classes:
+                cb = ttk.Checkbutton(sub_frame, text=class_name, variable=var)
+                cb.pack(anchor="w", pady=1)
+
+            col_idx += 1
+
+    def _update_flag_display(self) -> None:
+        total = 0
+        for group_name, subgroups in self.class_vars_map.items():
+            for sub_name, classes in subgroups:
+                for class_name, var, mask in classes:
+                    if var.get():
+                        total |= mask
+
+        self.flag_global_decimal.set(str(total))
+        self.flag_global_hex.set(hex(total))
+
+    def _select_all_classes(self) -> None:
+        for group_name, subgroups in self.class_vars_map.items():
+            for sub_name, classes in subgroups:
+                for class_name, var, mask in classes:
+                    var.set(True)
+        self._update_flag_display()
+
+    def _clear_all_classes(self) -> None:
+        for group_name, subgroups in self.class_vars_map.items():
+            for sub_name, classes in subgroups:
+                for class_name, var, mask in classes:
+                    var.set(False)
+        self._update_flag_display()
+
+    def _check_flag_dialog(self) -> None:
+        # Diálogo simples para inserção manual da flag
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Importar Flag de Classe")
+        dialog.geometry("350x120")
+        dialog.configure(bg=COLORS["background"])
+        dialog.resizable(False, False)
+        dialog.transient(self.root)
+        dialog.grab_set()
+
+        ttk.Label(dialog, text="Digite o valor decimal ou hexadecimal:").pack(pady=8)
+        entry_var = tk.StringVar()
+        entry = ttk.Entry(dialog, textvariable=entry_var, width=25)
+        entry.pack(pady=2)
+        entry.focus()
+
+        def apply_flag() -> None:
+            raw_val = entry_var.get().strip()
+            if not raw_val:
+                dialog.destroy()
+                return
+            try:
+                val = int(raw_val, 0)
+            except ValueError:
+                messagebox.showerror("Erro", "Valor inválido. Digite um número inteiro (ex: 4194304 ou 0x400000).", parent=dialog)
+                return
+            
+            # Define as caixas de seleção correspondentes
+            for group_name, subgroups in self.class_vars_map.items():
+                for sub_name, classes in subgroups:
+                    for class_name, var, mask in classes:
+                        var.set((val & mask) != 0)
+            self._update_flag_display()
+            dialog.destroy()
+
+        btn_row = ttk.Frame(dialog)
+        btn_row.pack(pady=8)
+        ttk.Button(btn_row, text="Confirmar", command=apply_flag, style="Accent.TButton").pack(side="left", padx=4)
+        ttk.Button(btn_row, text="Cancelar", command=dialog.destroy).pack(side="left", padx=4)
+
+    # -------------------------------------------------------------------------
+    # Chain Visualization Tab
+    # -------------------------------------------------------------------------
+    def _build_chain_tab(self, parent: ttk.Frame) -> None:
+        top_frame = ttk.Frame(parent)
+        top_frame.pack(fill="x", pady=(0, 8))
+        ttk.Label(top_frame, text="ID da spell inicial:").pack(side="left")
+        ttk.Entry(top_frame, textvariable=self.chain_spell_id_var, width=14).pack(side="left", padx=(6, 6))
+        ttk.Button(top_frame, text="Carregar Cadeia", command=self._load_chain, style="Accent.TButton").pack(side="left", padx=(0, 8))
+        ttk.Button(top_frame, text="Remover selecionadas da cadeia", command=self._remove_selected_chain).pack(side="left")
+
+        list_frame = ttk.LabelFrame(parent, text="Componentes da Corrente Encontrados", padding=6)
+        list_frame.pack(fill="both", expand=True)
+
+        canvas = tk.Canvas(list_frame, bg=COLORS["card"], highlightthickness=0)
+        scrollbar = ttk.Scrollbar(list_frame, orient="vertical", command=canvas.yview)
         scrollable = ttk.Frame(canvas)
 
         scrollable.bind(
@@ -1833,47 +2165,99 @@ class ItemBalancerApp:
         canvas.create_window((0, 0), window=scrollable, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
 
-        canvas.pack(side="left", fill="x", expand=True)
+        canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
-        for group in self.spell_class_groups:
-            group_frame = ttk.LabelFrame(scrollable, text=group['name'], padding=4)
-            group_frame.pack(fill="x", pady=2, padx=2)
-            row, col = 0, 0
-            for name, var, mask in group['classes']:
-                cb = ttk.Checkbutton(group_frame, text=name, variable=var)
-                cb.grid(row=row, column=col, sticky="w", padx=4, pady=1)
-                col += 1
-                if col > 2:
-                    col = 0
-                    row += 1
+        self.chain_container = scrollable
 
-        sel_frame = ttk.Frame(class_frame)
-        sel_frame.pack(fill="x", pady=(4, 0))
-        ttk.Button(sel_frame, text="Selecionar todas", command=self._select_all_classes).pack(side="left", padx=(0, 8))
-        ttk.Button(sel_frame, text="Desmarcar todas", command=self._deselect_all_classes).pack(side="left")
+    def _load_chain(self) -> None:
+        for w in self.chain_container.winfo_children():
+            w.destroy()
+        self.chain_widgets.clear()
 
-        ttk.Label(folder_frame, textvariable=self.spell_status_var, wraplength=1020).pack(anchor="w", pady=(4, 0))
+        spell_id = self.chain_spell_id_var.get().strip()
+        if not spell_id:
+            self.status_var.set("Digite um ID de spell para buscar.")
+            return
 
-        action_frame = ttk.LabelFrame(parent, text="Ações", padding=6)
-        action_frame.pack(fill="x", pady=(0, 8))
-        btn_row = ttk.Frame(action_frame)
-        btn_row.pack(fill="x", pady=2)
-        ttk.Button(btn_row, text="▶ Executar remoção de spells", command=self.run_spell_removal, style="Accent.TButton").pack(side="left", padx=(0, 8))
-        ttk.Button(btn_row, text="Visualizar relatório", command=self.preview_spell_removal).pack(side="left")
+        try:
+            spell_file = Path(self.spell_input_folder_var.get().strip()) / "C_Spell.ini"
+            if not spell_file.exists():
+                self.status_var.set("Erro: C_Spell.ini não encontrado na pasta de entrada configurada.")
+                return
+            spell_data = spell_file.read_bytes()
+            chain = get_spell_chain(spell_id, spell_data)
+        except Exception as e:
+            self.status_var.set(f"Erro ao processar cadeia: {e}")
+            return
 
-        report_frame = ttk.LabelFrame(parent, text="Relatório", padding=6)
-        report_frame.pack(fill="both", expand=True)
-        self.spell_report_text = tk.Text(report_frame, height=8, wrap="word", state="disabled",
-                                         bg="#ffffff", fg="#333", font=("Segoe UI", 9))
-        self.spell_report_text.pack(side="left", fill="both", expand=True)
-        scroll = ttk.Scrollbar(report_frame, orient="vertical", command=self.spell_report_text.yview)
-        scroll.pack(side="right", fill="y")
-        self.spell_report_text.configure(yscrollcommand=scroll.set)
-        self._write_spell_report("Aguardando execução...")
+        if not chain:
+            self.status_var.set(f"Nenhuma spell correspondente ao ID {spell_id} foi localizada.")
+            return
+
+        self.status_var.set(f"Cadeia localizada com sucesso. {len(chain)} elos identificados.")
+
+        for item in chain:
+            frame = ttk.Frame(self.chain_container)
+            frame.pack(fill="x", pady=2)
+
+            var = tk.BooleanVar(value=False)
+            cb = ttk.Checkbutton(frame, text=f"ID: {item['id']}", variable=var)
+            cb.pack(side="left", padx=4)
+
+            details = f"Nome: {item['name']} | Req. Level: {item['level']} | Classe Mask: {item['class_mask']} | Dep: {item['dep']}"
+            lbl = ttk.Label(frame, text=details, font=("Segoe UI", 9))
+            lbl.pack(side="left", padx=4)
+
+            self.chain_widgets.append((cb, lbl, item))
+
+    def _remove_selected_chain(self) -> None:
+        selected_ids = []
+        for cb, _, item in self.chain_widgets:
+            # Verifica o estado da checkbox usando a variável associada
+            for child in cb.master.winfo_children():
+                if isinstance(child, ttk.Checkbutton):
+                    var_name = child.cget("variable")
+                    if cb.tk.globalgetvar(var_name):
+                        selected_ids.append(item['id'])
+                        break
+
+        if not selected_ids:
+            self.status_var.set("Nenhuma habilidade foi selecionada para exclusão.")
+            return
+
+        confirm_msg = f"Deseja deletar {len(selected_ids)} spells e seus vínculos relacionados do arquivo?"
+        if not messagebox.askyesno("Confirmar Exclusão", confirm_msg, parent=self.root):
+            return
+
+        try:
+            input_folder = Path(self.spell_input_folder_var.get().strip())
+            output_folder = Path(self.spell_output_folder_var.get().strip())
+            if not input_folder.exists():
+                raise ItemIniError("A pasta de entrada não está configurada.")
+            output_folder.mkdir(parents=True, exist_ok=True)
+
+            keep = self.spell_keep_spells_var.get()
+            report = None
+            for sid in selected_ids:
+                report = process_spell_removal(
+                    input_folder, output_folder,
+                    progress_callback=lambda msg: self.status_var.set(msg),
+                    force_root_id=sid,
+                    class_masks=None,
+                    keep_spells=keep
+                )
+            
+            self.status_var.set("Processo de exclusão de ramificação concluído.")
+            if report:
+                messagebox.showinfo("Concluído", f"Spells removidas: {report.spells_removed}\nEnchants removidos: {report.enchants_removed}", parent=self.root)
+            self._load_chain()
+        except Exception as e:
+            self.status_var.set(f"Ocorreu um erro: {e}")
+            messagebox.showerror("Erro", str(e), parent=self.root)
 
     # -------------------------------------------------------------------------
-    # Common UI helpers
+    # COMMON HANDLERS
     # -------------------------------------------------------------------------
     def _write_report(self, text: str) -> None:
         self.report_text.configure(state="normal")
@@ -1893,9 +2277,6 @@ class ItemBalancerApp:
         self.spell_report_text.insert("1.0", text)
         self.spell_report_text.configure(state="disabled")
 
-    # -------------------------------------------------------------------------
-    # Balance callbacks (unchanged)
-    # -------------------------------------------------------------------------
     def select_file(self) -> None:
         f = filedialog.askopenfilename(parent=self.root, title="Selecione o INI principal",
                                        filetypes=(("Arquivo INI", "*.ini"), ("Todos", "*.*")))
@@ -2006,8 +2387,6 @@ class ItemBalancerApp:
         return f"{input_path.stem}_{'_'.join(tags)}{input_path.suffix or '.ini'}"
 
     def format_report(self, report: ProcessingReport, options: ProcessingOptions, out_path: Path) -> str:
-        round_label = self.ROUND_LABELS.get(options.defence_round_mode, options.defence_round_mode)
-        move_mode = "somando" if options.add_to_existing_con else "substituindo"
         cooldown = ", ".join(sorted(options.cooldown_groups)) if options.cooldown_groups else "nenhum"
         return (
             f"Arquivo salvo: {out_path}\n\n"
@@ -2024,7 +2403,7 @@ class ItemBalancerApp:
         )
 
     # -------------------------------------------------------------------------
-    # Item Removal callbacks (unchanged)
+    # Item Removal Callbacks
     # -------------------------------------------------------------------------
     def select_removal_input_folder(self) -> None:
         f = filedialog.askdirectory(parent=self.root, title="Selecione a pasta com C_*.ini")
@@ -2169,7 +2548,7 @@ class ItemBalancerApp:
         return "\n".join(lines)
 
     # -------------------------------------------------------------------------
-    # Spell Removal callbacks
+    # Spell Removal Callbacks
     # -------------------------------------------------------------------------
     def select_spell_input_folder(self) -> None:
         f = filedialog.askdirectory(parent=self.root, title="Selecione a pasta com C_Spell.ini e C_Enchant.ini")
@@ -2196,10 +2575,11 @@ class ItemBalancerApp:
 
     def _get_selected_class_masks(self) -> set[int] | None:
         masks = set()
-        for group in self.spell_class_groups:
-            for _, var, mask in group['classes']:
-                if var.get():
-                    masks.add(mask)
+        for group_name, subgroups in self.class_vars_map.items():
+            for sub_name, classes in subgroups:
+                for class_name, var, mask in classes:
+                    if var.get():
+                        masks.add(mask)
         return masks if masks else None
 
     def _get_spell_files(self) -> tuple[Path, Path, Path]:
@@ -2224,49 +2604,42 @@ class ItemBalancerApp:
             if force_id and not force_id.isdigit():
                 raise ItemIniError("ID deve ser numérico.")
             keep = self.spell_keep_spells_var.get()
+            absolute_force = self.spell_absolute_force_var.get()
             selected_masks = self._get_selected_class_masks()
 
             msg_lines = [
-                "Processar:",
-                f"- {spell_file.name}",
-                f"- {enchant_file.name}",
-                f"ID: {force_id if force_id else 'automático'}",
+                "Processar com as configurações definidas?",
+                f"ID Alvo: {force_id if force_id else 'Filtro por Profissões'}",
             ]
-            if force_id:
-                msg_lines.append("(ID específico ignora filtro de classe)")
-            elif selected_masks:
-                msg_lines.append(f"Filtro de classe: {len(selected_masks)} classes selecionadas (ignorando nível)")
-            else:
-                msg_lines.append("Filtro padrão: nível≤30 e classes padrão")
-            msg_lines.append(f"Modo: {'Apenas referências' if keep else 'Completo (remove spells)'}")
-            msg_lines.append(f"Saída: {out_path}")
-            msg_lines.append("\nDeseja continuar?")
+            if not force_id:
+                if selected_masks:
+                    mode_str = "Absoluto" if absolute_force else "Subconjunto"
+                    msg_lines.append(f"Filtro: {len(selected_masks)} classes marcadas ({mode_str})")
+                else:
+                    msg_lines.append("Filtro padrão do sistema (Nível <= 30 e classes padrão)")
 
-            if not messagebox.askyesno("Confirmar", "\n".join(msg_lines), parent=self.root):
+            msg_lines.append(f"Destino da gravação: {out_path}")
+            if not messagebox.askyesno("Confirmar Remoção", "\n".join(msg_lines), parent=self.root):
                 return
 
             self.spell_progress_var.set("Processando...")
             self.root.update_idletasks()
 
-            def progress_callback(msg: str) -> None:
-                self.spell_progress_var.set(msg)
-
             report = process_spell_removal(
                 Path(self.spell_input_folder_var.get()), out_path,
-                progress_callback=progress_callback,
+                progress_callback=lambda msg: self.spell_progress_var.set(msg),
                 force_root_id=force_id if force_id else None,
                 class_masks=selected_masks,
-                keep_spells=keep
+                keep_spells=keep,
+                absolute_force=absolute_force
             )
             self.spell_progress_var.set("Concluído!")
             self._write_spell_report(self._format_spell_report(report))
             summary = (
-                f"Spells removidas: {report.spells_removed}\n"
-                f"Enchants removidos: {report.enchants_removed}\n"
-                f"Spells por enchants: {report.spells_removed_by_enchant_ref}\n"
-                f"Itens removidos: {report.items_removed_by_enchant_ref}\n"
-                f"Refs loja: {report.item_store_refs_removed}\n"
-                f"Refs drop: {report.item_drop_refs_removed}"
+                f"Spells deletadas: {report.spells_removed}\n"
+                f"Enchants deletados: {report.enchants_removed}\n"
+                f"Itens afetados deletados: {report.items_removed_by_enchant_ref}\n"
+                f"Referências limpas em Drops: {report.item_drop_refs_removed}"
             )
             messagebox.showinfo("Concluído", summary, parent=self.root)
         except Exception as e:
@@ -2280,91 +2653,72 @@ class ItemBalancerApp:
             if force_id and not force_id.isdigit():
                 raise ItemIniError("ID deve ser numérico.")
             selected_masks = self._get_selected_class_masks()
+            absolute_force = self.spell_absolute_force_var.get()
 
             spell_data = spell_file.read_bytes()
-            ids, _ = collect_spell_ids_to_remove(spell_data, force_id if force_id else None, selected_masks)
-            lines = ["=== PRÉ-VISUALIZAÇÃO (sem alterações) ===\n"]
+            ids, _ = collect_spell_ids_to_remove(
+                spell_data, force_id if force_id else None, selected_masks, absolute_force
+            )
+            lines = ["=== PRÉ-VISUALIZAÇÃO (NENHUM ARQUIVO FOI ALTERADO) ===\n"]
             if force_id:
                 lines.append(f"Modo ID específico: {force_id}")
             elif selected_masks:
-                lines.append(f"Filtro por {len(selected_masks)} classes (nível ignorado)")
+                mode_str = "Forçar Absoluto" if absolute_force else "Subconjunto"
+                lines.append(f"Filtro ativo por {len(selected_masks)} classes combinadas ({mode_str})")
             else:
-                lines.append("Filtro padrão: nível≤30 e classes padrão")
+                lines.append("Filtro padrão de segurança: Nível <= 30 e classes padrão")
 
             if not ids:
-                lines.append("Nenhuma spell alvo.")
+                lines.append("\nNenhuma spell atende aos critérios configurados.")
                 self._write_spell_report("\n".join(lines))
                 return
 
             dep_map = build_dependency_map(spell_data)
             expanded = expand_chain(ids, dep_map)
-            lines.append(f"\nSpells alvo (cadeia expandida): {len(expanded)}")
+            lines.append(f"\nSpells alvo encontradas (com suas dependências): {len(expanded)}")
             if expanded:
                 ids_str = ", ".join(sorted(expanded)[:50])
                 if len(expanded) > 50:
-                    ids_str += f" ... (+{len(expanded)-50} restantes)"
-                lines.append(f"IDs: {ids_str}")
+                    ids_str += f" ... (+ {len(expanded)-50} itens ocultados)"
+                lines.append(f"Amostra de IDs: {ids_str}")
 
             keep = self.spell_keep_spells_var.get()
             if keep:
                 protected = get_all_buff_enchants(spell_data)
-                lines.append(f"\nModo 'apenas referências': TODOS OS {len(protected)} buffs de spells serão protegidos.")
+                lines.append(f"\nModo 'Apenas referências' ativo. Mantendo spells e protegendo {len(protected)} enchants.")
             else:
                 protected = get_protected_enchants_from_spells(spell_data, expanded)
-                lines.append(f"\nEnchants protegidos (buffs de spells não removidas): {len(protected)}")
+                lines.append(f"\nEnchants protegidos (Apoio a spells ativas): {len(protected)}")
 
-            # Candidatos iniciais
             candidates, _ = find_enchants_referencing_spells(enchant_file.read_bytes(), expanded, protected)
-            lines.append(f"\nCandidatos a remoção (referenciam spells alvo): {len(candidates)}")
-            if candidates:
-                ids_str = ", ".join(sorted(candidates)[:30])
-                if len(candidates) > 30:
-                    ids_str += f" ... (+{len(candidates)-30} restantes)"
-                lines.append(f"IDs: {ids_str}")
-
-            # Refinamento (simulado)
-            refined = candidates
-            # Simular o refinamento mostrando resultado final
-            # Não executamos o refinamento real aqui para não processar duas vezes, mas podemos indicar.
-            # Para simplificar, não mostramos o refinamento na prévia, apenas os candidatos.
-            # Mas podemos adicionar uma nota.
-            lines.append("\n(Os candidatos serão refinados para evitar remoção de enchants ainda referenciados)")
+            lines.append(f"Candidatos iniciais para exclusão em C_Enchant.ini: {len(candidates)}")
 
             self._write_spell_report("\n".join(lines))
         except Exception as e:
             messagebox.showerror("Erro", str(e), parent=self.root)
 
     def _format_spell_report(self, report: SpellRemovalReport) -> str:
-        lines = ["=== RELATÓRIO DE REMOÇÃO DE SPELLS ===\n"]
-        lines.append(f"Spells removidas: {report.spells_removed}")
+        lines = ["=== RELATÓRIO DO PROCESSAMENTO DE SPELLS ===\n"]
+        lines.append(f"Spells excluídas do arquivo: {report.spells_removed}")
         lines.append(f"Enchants removidos: {report.enchants_removed}")
-        lines.append(f"Spells por enchants: {report.spells_removed_by_enchant_ref}")
-        lines.append(f"Itens removidos: {report.items_removed_by_enchant_ref}")
-        lines.append(f"Refs loja: {report.item_store_refs_removed}")
-        lines.append(f"Refs drop: {report.item_drop_refs_removed}")
+        lines.append(f"Spells associadas removidas por cascata: {report.spells_removed_by_enchant_ref}")
+        lines.append(f"Itens vinculados a enchants inativos deletados: {report.items_removed_by_enchant_ref}")
+        lines.append(f"Referências limpas em Lojas: {report.item_store_refs_removed}")
+        lines.append(f"Referências limpas em DropItem: {report.item_drop_refs_removed}")
+        
         if report.spells_removed_ids:
-            lines.append(f"\nSpells removidas ({len(report.spells_removed_ids)}):")
+            lines.append(f"\nSpells Removidas ({len(report.spells_removed_ids)}):")
             for i in range(0, len(report.spells_removed_ids), 10):
                 lines.append("  " + ", ".join(report.spells_removed_ids[i:i+10]))
         if report.enchants_removed_ids:
-            lines.append(f"\nEnchants removidos ({len(report.enchants_removed_ids)}):")
+            lines.append(f"\nEnchants Removidos ({len(report.enchants_removed_ids)}):")
             for i in range(0, len(report.enchants_removed_ids), 10):
                 lines.append("  " + ", ".join(report.enchants_removed_ids[i:i+10]))
         if report.items_removed_by_enchant_ref_ids:
-            lines.append(f"\nItens removidos ({len(report.items_removed_by_enchant_ref_ids)}):")
+            lines.append(f"\nItens Removidos ({len(report.items_removed_by_enchant_ref_ids)}):")
             for i in range(0, len(report.items_removed_by_enchant_ref_ids), 10):
                 lines.append("  " + ", ".join(report.items_removed_by_enchant_ref_ids[i:i+10]))
         return "\n".join(lines)
-
-    def _select_all_classes(self) -> None:
-        for group in self.spell_class_groups:
-            for _, var, _ in group['classes']:
-                var.set(True)
-
-    def _deselect_all_classes(self) -> None:
-        for group in self.spell_class_groups:
-            for _, var, _ in group['classes']:
-                var.set(False)
 
 
 def main() -> None:
